@@ -4,6 +4,8 @@ extends Node
 
 @export var vehicle_id: StringName = &"prototype_vehicle"
 @export var critical_part_ids: Array[StringName] = []
+@export var electrical_part_ids: Array[StringName] = []
+@export var engine_critical_part_ids: Array[StringName] = []
 
 var registry: Dictionary = {}
 
@@ -64,6 +66,10 @@ func get_partially_secure_parts() -> Array[AutomotivePart]:
 
 
 func get_vehicle_readiness() -> float:
+	return get_mechanical_readiness()
+
+
+func get_mechanical_readiness() -> float:
 	if critical_part_ids.is_empty():
 		return 1.0
 	var score: float = 0.0
@@ -72,6 +78,39 @@ func get_vehicle_readiness() -> float:
 		if part and part.installed:
 			score += part.get_fastening_ratio() if part.required_fasteners > 0 else 1.0
 	return score / float(critical_part_ids.size())
+
+
+func get_electrical_readiness() -> float:
+	if electrical_part_ids.is_empty():
+		return 1.0
+	var score := 0.0
+	for id in electrical_part_ids:
+		var part := get_part(id)
+		if part and part.installed:
+			score += 0.5
+			if part.has_method("is_electrically_connected") and part.is_electrically_connected():
+				score += 0.5
+	return score / float(electrical_part_ids.size())
+
+
+func get_engine_readiness() -> float:
+	if engine_critical_part_ids.is_empty():
+		return 1.0
+	var score := 0.0
+	for id in engine_critical_part_ids:
+		var part := get_part(id)
+		if part and part.installed:
+			score += 1.0 if part.is_secure() else maxf(part.get_fastening_ratio(), 0.25)
+	return score / float(engine_critical_part_ids.size())
+
+
+func get_missing_engine_parts() -> Array[StringName]:
+	var missing: Array[StringName] = []
+	for id in engine_critical_part_ids:
+		var part := get_part(id)
+		if not part or not part.installed:
+			missing.append(id)
+	return missing
 
 
 func validate_dependencies(nodes: Dictionary) -> PackedStringArray:
@@ -92,4 +131,10 @@ func validate_dependencies(nodes: Dictionary) -> PackedStringArray:
 	for id in critical_part_ids:
 		if not nodes.get(id) is AutomotivePart:
 			issues.append("Peça crítica desconhecida: " + str(id))
+	for id in electrical_part_ids:
+		if not nodes.get(id) is AutomotivePart:
+			issues.append("Peça elétrica desconhecida: " + str(id))
+	for id in engine_critical_part_ids:
+		if not nodes.get(id) is AutomotivePart:
+			issues.append("Peça crítica do motor desconhecida: " + str(id))
 	return issues

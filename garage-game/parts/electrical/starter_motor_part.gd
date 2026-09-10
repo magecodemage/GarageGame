@@ -10,6 +10,10 @@ var electrical_connected: bool:
 			electrical.is_connected = value
 
 
+func is_electrically_connected() -> bool:
+	return electrical_connected
+
+
 func get_custom_state() -> Dictionary:
 	return {"electrical": electrical.capture_state()}
 

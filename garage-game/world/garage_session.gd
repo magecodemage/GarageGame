@@ -31,6 +31,8 @@ func handle_shortcut(event: InputEvent) -> bool:
 		save_system.load_game()
 	elif event.is_action_pressed("reset_test_scene"):
 		get_tree().paused = false
+		for mode in get_tree().get_nodes_in_group("engine_test_modes"):
+			mode.reset_mode()
 		save_system.reset_test_scene()
 		player.set_controls_enabled(true)
 	else:

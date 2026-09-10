@@ -9,6 +9,7 @@ func run(t: SceneTree) -> void:
 	var air_filter := t.part(&"air_filter_box") as AirFilterBoxPart
 	var alternator := t.part(&"alternator") as AlternatorPart
 	var starter := t.part(&"starter_motor") as StarterMotorPart
+	var coolant_system := t.garage.get_node("CarPrototype/EngineSystems/CoolantSystem") as CoolantSystem
 	var wheel_socket: PartSocket = t.socket_by_id(&"front_left_wheel_socket")
 	var caliper_socket: PartSocket = t.socket_by_id(&"front_left_brake_caliper_socket")
 	var battery_socket: PartSocket = t.socket_by_id(&"battery_mount")
@@ -23,8 +24,9 @@ func run(t: SceneTree) -> void:
 	caliper.end_hold()
 	battery.charge = 0.63
 	battery.condition = 0.78
-	battery.battery_positive_terminal.is_connected = false
+	battery.set_terminal_connected(true, false)
 	radiator.coolant_amount = 3.4
+	coolant_system.coolant_amount = 3.4
 	air_filter.air_filter_condition = 0.41
 	alternator.belt_connected = false
 	alternator.electrical_connected = false
@@ -42,8 +44,9 @@ func run(t: SceneTree) -> void:
 	for bolt in caliper_socket.fasteners:
 		bolt.set_tightness(4)
 	battery.charge = 1.0
-	battery.battery_positive_terminal.is_connected = true
+	battery.set_terminal_connected(true, true)
 	radiator.coolant_amount = radiator.coolant_capacity
+	coolant_system.coolant_amount = coolant_system.coolant_capacity
 	air_filter.air_filter_condition = 1.0
 	alternator.belt_connected = true
 	alternator.electrical_connected = true

@@ -1,7 +1,7 @@
 class_name SceneSnapshot
 extends RefCounted
 
-const VERSION: int = 2
+const VERSION: int = 3
 
 
 static func capture(registry: SceneRegistry, player: FirstPersonPlayer) -> Dictionary:
@@ -9,7 +9,7 @@ static func capture(registry: SceneRegistry, player: FirstPersonPlayer) -> Dicti
 	player_data["pitch"] = player.camera.rotation.x
 	player_data["crouched"] = player.crouched
 	var data: Dictionary = {"version": VERSION, "player": player_data,
-		"items": [], "fasteners": [], "toolboxes": []}
+		"items": [], "fasteners": [], "toolboxes": [], "systems": []}
 	for item in registry.items:
 		var record := SnapshotCodec.pose(item)
 		record["id"] = str(item.get_persistent_id())
@@ -28,6 +28,8 @@ static func capture(registry: SceneRegistry, player: FirstPersonPlayer) -> Dicti
 			"installed": fastener.installed, "locked": fastener.locked})
 	for toolbox in registry.toolboxes:
 		data["toolboxes"].append({"id": str(toolbox.toolbox_id), "open": toolbox.is_open})
+	for system in registry.runtime_systems:
+		data["systems"].append({"id": str(system.system_id), "data": system.capture_state()})
 	return data
 
 
@@ -60,5 +62,10 @@ static func apply(data: Dictionary, registry: SceneRegistry, player: FirstPerson
 	for socket in registry.sockets:
 		if socket is PartSocket and socket.installed_part:
 			socket.installed_part.refresh_fastening_state()
+	for record: Dictionary in data["systems"]:
+		var system := registry.nodes[StringName(record["id"])] as VehicleRuntimeSystem
+		system.apply_state(record["data"])
+	for system in registry.runtime_systems:
+		system.normalize_after_load()
 	var player_data: Dictionary = data["player"]
 	player.restore_pose(SnapshotCodec.transform_of(player_data), float(player_data["pitch"]), player_data["crouched"])

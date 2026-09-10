@@ -12,13 +12,15 @@ static func validate(data: Dictionary, registry: SceneRegistry) -> String:
 		return "Inclinação da câmera inválida"
 	if not player.get("crouched") is bool:
 		return "Estado de agachamento inválido"
-	for key in ["items", "fasteners", "toolboxes"]:
+	for key in ["items", "fasteners", "toolboxes", "systems"]:
 		if not data.get(key) is Array:
 			return "Save incompleto: " + key
 	if data["items"].size() != registry.items.size() or data["fasteners"].size() != registry.fasteners.size():
 		return "O save não corresponde aos objetos desta cena"
 	if data["toolboxes"].size() != registry.toolboxes.size():
 		return "Quantidade de caixas incompatível"
+	if data["systems"].size() != registry.runtime_systems.size():
+		return "Quantidade de sistemas do veículo incompatível"
 	var seen: Dictionary = {}
 	var occupied: Dictionary = {}
 	for value: Variant in data["items"]:
@@ -68,6 +70,15 @@ static func validate(data: Dictionary, registry: SceneRegistry) -> String:
 			return "ID de caixa ausente, desconhecido ou repetido"
 		if not registry.nodes[StringName(value["id"])] is Toolbox or not value.get("open") is bool:
 			return "Estado de caixa inválido"
+	for value: Variant in data["systems"]:
+		if not _valid_record(value, registry, seen):
+			return "ID de sistema ausente, desconhecido ou repetido"
+		var system := registry.nodes[StringName(value["id"])] as VehicleRuntimeSystem
+		if not system or not value.get("data") is Dictionary:
+			return "Estado de sistema inválido"
+		var system_error := system.validate_saved_state(value["data"])
+		if not system_error.is_empty():
+			return system_error
 	return ""
 
 

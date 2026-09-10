@@ -92,6 +92,26 @@ loosen={
 "deadzone": 0.2,
 "events": [Object(InputEventMouseButton,"button_index":5)]
 }
+engine_test_mode={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"physical_keycode":84)]
+}
+ignition_toggle={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"physical_keycode":73)]
+}
+engine_start={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"physical_keycode":75)]
+}
+engine_throttle={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"physical_keycode":87)]
+}
+debug_add_fuel={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"physical_keycode":4194338)]
+}
 
 [layer_names]
 

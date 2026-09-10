@@ -156,6 +156,7 @@ func run() -> void:
 	await _movement_checks()
 	await (load("res://systems/tests/mechanics_checks.gd").new() as RefCounted).run(self)
 	await (load("res://systems/tests/persistence_checks.gd").new() as RefCounted).run(self)
+	await (load("res://systems/tests/engine_checks.gd").new() as RefCounted).run(self)
 	Input.action_release("primary_interact")
 	Input.action_release("secondary_interact")
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -216,4 +217,6 @@ func _check_input_map() -> void:
 		key.physical_keycode = entry[0]
 		key.pressed = true
 		check(InputMap.event_is_action(key, entry[1]), "InputMap reconhece " + entry[1])
+	for action in [&"engine_test_mode", &"ignition_toggle", &"engine_start", &"engine_throttle", &"debug_add_fuel"]:
+		check(InputMap.has_action(action), "InputMap contém " + action)
 	check(not InputMap.has_action("interact") and not InputMap.has_action("drop_part"), "E/Q antigos removidos do InputMap")

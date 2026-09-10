@@ -24,6 +24,11 @@ circuito elétrico completo nem assets externos.
 - F3: debug do alvo.
 - F8: reset da garagem.
 - Esc: liberar o mouse.
+- T: entrar/sair do modo temporário de teste do motor.
+- I: alternar ignição OFF/IGNITION dentro do modo de teste.
+- K segurado: posição START; soltar retorna a IGNITION.
+- W: acelerador somente no modo de teste; fora dele continua sendo movimento FPS.
+- F7: adicionar 5 litros de combustível para debug.
 
 ## Arquitetura
 
@@ -43,6 +48,8 @@ player/                 personagem e câmera
 parts/                  base e cenas de peças
 systems/mechanics/      dependências declarativas
 systems/electrical/     fundação elétrica reutilizável
+systems/engine/         motor, ignição, fluidos, diagnóstico e áudio
+systems/vehicle/        base persistente de sistemas do veículo
 systems/save/           registro, snapshot, validação e save
 tools/                  ferramentas, slots e toolbox
 vehicles/               sockets, fasteners e conjuntos do veículo
@@ -124,6 +131,78 @@ de captura, restauração e validação de estado. Ainda não calcula corrente.
 `RadiatorPart` guarda `coolant_capacity`, `coolant_amount` e a condição herdada.
 `AirFilterBoxPart` guarda `air_filter_condition`.
 
+Os terminais da bateria são ligados aos fasteners
+`battery_positive_terminal_fastener` e `battery_negative_terminal_fastener`.
+Tightness acima de zero representa conexão elétrica. A classe
+`ElectricalComponent.bind_fastener()` permite reutilizar o mesmo mecanismo em
+luzes, velas e outros componentes futuros.
+
+## Motor funcional
+
+`EngineController` é um `VehicleRuntimeSystem` configurado por referências de
+sistema e IDs de peças. Ele nunca procura NodePaths concretos internamente.
+Estados: `OFF`, `CRANKING`, `RUNNING`, `STALLED` e `FAILED`.
+
+A partida passa por `can_crank()` e `can_engine_start()`. O starter só gira com
+bateria e starter instalados/conectados e carga acima do limite crítico. Após
+`minimum_crank_time`, o motor só pega se houver RPM de partida suficiente,
+combustível, ignição e todas as peças de `engine_critical_part_ids`.
+
+`EngineStartDiagnostic` centraliza códigos e mensagens:
+
+- `NO_BATTERY`;
+- `BATTERY_DISCONNECTED`;
+- `LOW_BATTERY`;
+- `NO_STARTER`;
+- `STARTER_DISCONNECTED`;
+- `NO_FUEL`;
+- `NO_IGNITION`;
+- `CRITICAL_PART_MISSING`.
+
+Para adicionar futuramente uma peça que impeça partida, dê a ela um ID estável,
+inclua esse ID em `VehicleMechanicalState.engine_critical_part_ids` e mantenha a
+peça derivada de `AutomotivePart`. O diagnóstico e o controller passam a
+considerá-la sem condicionais de classe no Player.
+
+`IgnitionSystem` possui `OFF`, `ACCESSORY`, `IGNITION` e `START`. START só existe
+enquanto a ação K está pressionada; captura e load normalizam START para
+IGNITION. `EngineTestMode` isola os controles de bancada e desabilita movimento
+FPS enquanto W representa throttle.
+
+`FuelSystem` guarda litros, capacidade e tipo e consome conforme RPM.
+`OilSystem` permite funcionamento com pouco óleo, mas retorna uma taxa de dano
+conservadora. `CoolantSystem` é a fonte canônica do volume de coolant e sincroniza
+o `RadiatorPart`. Com radiador e nível adequados a temperatura converge para a
+faixa operacional; sem eles sobe rapidamente. Acima da temperatura crítica o
+motor perde condição gradualmente.
+
+A bateria possui carga normalizada, capacidade em Ah, tensão aproximada variável,
+`consume_energy()` e `charge_battery()`. O starter consome 220 A durante crank.
+O alternador produz corrente conforme RPM somente quando instalado, conectado e
+com correia. Sem alternador o motor continua enquanto houver energia.
+
+`EngineAudio` expõe slots vazios para starter, idle, running, shutdown e failed
+starter. Nenhum arquivo de áudio externo foi incluído.
+
+Sinais disponíveis: `engine_started`, `engine_stopped`, `engine_stalled`,
+`engine_state_changed`, `rpm_changed`, `temperature_changed`,
+`engine_condition_changed`, `alternator_output_changed`,
+`battery_charge_changed`, `fuel_changed`, `ignition_state_changed` e
+`starter_command_changed`. Valores contínuos só emitem quando ultrapassam um
+limiar útil. Combustível, bateria, dano e temperatura são atualizados a 10 Hz;
+somente estado/RPM usam physics process.
+
+## Readiness
+
+`VehicleMechanicalState` expõe avaliações separadas:
+
+- `get_mechanical_readiness()`: presença e fastening ratio das peças críticas;
+- `get_electrical_readiness()`: presença e conexão das peças elétricas;
+- `get_engine_readiness()`: presença e segurança das peças essenciais do motor.
+
+Essas métricas são consultas. As regras de partida usam os estados e diagnósticos
+concretos, em vez de comparar uma porcentagem arbitrária.
+
 ## Como adicionar uma peça
 
 1. Crie uma cena `RigidBody3D` com script derivado de `AutomotivePart`, meshes e
@@ -145,7 +224,7 @@ Nenhuma condição sobre classes concretas deve ser adicionada ao Player ou ao
 
 ## Save, load e reset
 
-O schema 2 usa `user://garage_slice_v2.json`. Ele persiste:
+O schema 3 usa `user://garage_slice_v3.json`. Ele persiste:
 
 - pose, pitch e agachamento do jogador;
 - ID, transform, socket, estado instalado/armazenado, condição, desgaste e
@@ -153,6 +232,9 @@ O schema 2 usa `user://garage_slice_v2.json`. Ele persiste:
 - `custom_state` de bateria, radiador, filtro, alternador e motor de partida;
 - tightness, presença e lock de cada fastener;
 - estado da toolbox.
+- estado normalizado de ignição e motor, RPM, temperatura e condição;
+- combustível, óleo e coolant;
+- carga/capacidade/conexões da bateria e conexões de starter/alternador.
 
 O load valida todo o snapshot antes de alterar a cena. A restauração libera
 vínculos, posiciona objetos, reconecta sockets por ID, restaura fasteners e
@@ -170,7 +252,8 @@ distância insuficiente.
 
 F3 acrescenta ID, classe de script, tipo, socket, estado, fastening ratio,
 dependências e blocking parts. Fasteners mostram ferramenta, tamanho, tightness
-e lock.
+e lock. O painel do veículo mostra Engine State, RPM, bateria, combustível, óleo,
+coolant, temperatura, condição, starter, alternador, ignição e Start blockers.
 
 ## Validação
 
@@ -182,8 +265,8 @@ Godot --headless --path . --script res://systems/tests/prototype_test.gd
 ```
 
 O runner verifica InputMap, movimento, pulo, crouch, IDs, sockets, dependências,
-tipos, ferramenta errada/correta, estados mecânicos, os onze testes de aceitação,
-save/load parcial e reset. O resultado também é gravado em
+tipos, ferramenta errada/correta, estados mecânicos, os testes mecânicos e os 14
+testes do motor, save/load parcial e reset. O resultado também é gravado em
 `.godot/slice_test_result.json`. Warnings produzidos pelos dois snapshots
 inválidos são esperados; erros de parser/runtime não são.
 

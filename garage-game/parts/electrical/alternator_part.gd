@@ -11,6 +11,14 @@ var electrical_connected: bool:
 			electrical.is_connected = value
 
 
+func is_electrically_connected() -> bool:
+	return electrical_connected
+
+
+func is_operational() -> bool:
+	return installed and electrical_connected and belt_connected and condition > 0.0
+
+
 func get_custom_state() -> Dictionary:
 	return {"belt_connected": belt_connected, "electrical": electrical.capture_state()}
 

@@ -7,6 +7,7 @@ var items: Array[Grabbable] = []
 var sockets: Array[SnapSocket] = []
 var fasteners: Array[Fastener] = []
 var toolboxes: Array[Toolbox] = []
+var runtime_systems: Array[VehicleRuntimeSystem] = []
 var issues := PackedStringArray()
 
 
@@ -16,6 +17,7 @@ func rebuild(scene: Node) -> bool:
 	sockets.clear()
 	fasteners.clear()
 	toolboxes.clear()
+	runtime_systems.clear()
 	issues.clear()
 	for node in scene.get_tree().get_nodes_in_group("persistable"):
 		if not scene.is_ancestor_of(node):
@@ -35,6 +37,8 @@ func rebuild(scene: Node) -> bool:
 			fasteners.append(node)
 		elif node is Toolbox:
 			toolboxes.append(node)
+		elif node is VehicleRuntimeSystem:
+			runtime_systems.append(node)
 		if node.has_method("validate_configuration"):
 			issues.append_array(node.validate_configuration())
 	for state_node in scene.get_tree().get_nodes_in_group("vehicle_mechanical_states"):
