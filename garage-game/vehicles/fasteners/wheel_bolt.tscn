@@ -1,0 +1,44 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://vehicles/fasteners/fastener.gd" id="1"]
+[ext_resource type="Script" path="res://vehicles/fasteners/fastener_spec.gd" id="2"]
+[ext_resource type="Script" path="res://systems/interaction_audio.gd" id="3"]
+
+[sub_resource type="Resource" id="Spec"]
+script = ExtResource("2")
+required_tool_type = &"wrench"
+required_tool_size = 17
+max_tightness = 4
+
+[sub_resource type="CylinderMesh" id="Mesh"]
+top_radius = 0.031
+bottom_radius = 0.031
+height = 0.045
+radial_segments = 6
+
+[sub_resource type="StandardMaterial3D" id="Material"]
+albedo_color = Color(0.6, 0.65, 0.68, 1)
+
+[sub_resource type="SphereShape3D" id="HitShape"]
+radius = 0.046
+
+[node name="WheelBolt" type="Area3D" node_paths=PackedStringArray("bolt_mesh", "interaction_audio")]
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+script = ExtResource("1")
+spec = SubResource("Spec")
+bolt_mesh = NodePath("Mesh")
+interaction_audio = NodePath("Audio")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+rotation = Vector3(0, 0, 1.5707963)
+mesh = SubResource("Mesh")
+material_override = SubResource("Material")
+
+[node name="HitShape" type="CollisionShape3D" parent="."]
+shape = SubResource("HitShape")
+
+[node name="Audio" type="AudioStreamPlayer3D" parent="."]
+script = ExtResource("3")
+max_distance = 8.0

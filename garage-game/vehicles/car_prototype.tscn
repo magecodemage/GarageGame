@@ -1,0 +1,235 @@
+[gd_scene load_steps=33 format=3]
+
+[ext_resource type="PackedScene" path="res://vehicles/wheel_socket.tscn" id="1"]
+[sub_resource type="StandardMaterial3D" id="Box1Material"]
+albedo_color = Color(0.12, 0.3, 0.32, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box1Mesh"]
+size = Vector3(1.7, 0.32, 3.4)
+material = SubResource("Box1Material")
+
+[sub_resource type="BoxShape3D" id="Box1Shape"]
+size = Vector3(1.7, 0.32, 3.4)
+
+[sub_resource type="StandardMaterial3D" id="Box2Material"]
+albedo_color = Color(0.19, 0.38, 0.39, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box2Mesh"]
+size = Vector3(1.48, 0.65, 1.65)
+material = SubResource("Box2Material")
+
+[sub_resource type="BoxShape3D" id="Box2Shape"]
+size = Vector3(1.48, 0.65, 1.65)
+
+[sub_resource type="StandardMaterial3D" id="Box3Material"]
+albedo_color = Color(0.08, 0.14, 0.18, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box3Mesh"]
+size = Vector3(1.28, 0.4, 0.015)
+material = SubResource("Box3Material")
+
+[sub_resource type="StandardMaterial3D" id="Box4Material"]
+albedo_color = Color(0.17, 0.37, 0.38, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box4Mesh"]
+size = Vector3(1.56, 0.08, 0.95)
+material = SubResource("Box4Material")
+
+[sub_resource type="StandardMaterial3D" id="Box5Material"]
+albedo_color = Color(0.5, 0.55, 0.56, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box5Mesh"]
+size = Vector3(1.8, 0.15, 0.16)
+material = SubResource("Box5Material")
+
+[sub_resource type="BoxShape3D" id="Box5Shape"]
+size = Vector3(1.8, 0.15, 0.16)
+
+[sub_resource type="StandardMaterial3D" id="Box6Material"]
+albedo_color = Color(0.95, 0.87, 0.6, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box6Mesh"]
+size = Vector3(0.32, 0.16, 0.03)
+material = SubResource("Box6Material")
+
+[sub_resource type="StandardMaterial3D" id="Box7Material"]
+albedo_color = Color(0.95, 0.87, 0.6, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box7Mesh"]
+size = Vector3(0.32, 0.16, 0.03)
+material = SubResource("Box7Material")
+
+[sub_resource type="StandardMaterial3D" id="Box8Material"]
+albedo_color = Color(0.82, 0.44, 0.1, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box8Mesh"]
+size = Vector3(0.3, 0.8, 0.35)
+material = SubResource("Box8Material")
+
+[sub_resource type="BoxShape3D" id="Box8Shape"]
+size = Vector3(0.3, 0.8, 0.35)
+
+[sub_resource type="StandardMaterial3D" id="Box9Material"]
+albedo_color = Color(0.82, 0.44, 0.1, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box9Mesh"]
+size = Vector3(0.3, 0.8, 0.35)
+material = SubResource("Box9Material")
+
+[sub_resource type="BoxShape3D" id="Box9Shape"]
+size = Vector3(0.3, 0.8, 0.35)
+
+[sub_resource type="StandardMaterial3D" id="Box10Material"]
+albedo_color = Color(0.82, 0.44, 0.1, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box10Mesh"]
+size = Vector3(0.3, 0.8, 0.35)
+material = SubResource("Box10Material")
+
+[sub_resource type="BoxShape3D" id="Box10Shape"]
+size = Vector3(0.3, 0.8, 0.35)
+
+[sub_resource type="StandardMaterial3D" id="Box11Material"]
+albedo_color = Color(0.82, 0.44, 0.1, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box11Mesh"]
+size = Vector3(0.3, 0.8, 0.35)
+material = SubResource("Box11Material")
+
+[sub_resource type="BoxShape3D" id="Box11Shape"]
+size = Vector3(0.3, 0.8, 0.35)
+
+[sub_resource type="CylinderMesh" id="FixedWheelMesh"]
+top_radius = 0.42
+bottom_radius = 0.42
+height = 0.24
+
+[sub_resource type="StandardMaterial3D" id="FixedWheelMaterial"]
+albedo_color = Color(0.065, 0.07, 0.08, 1)
+
+[node name="CarPrototype" type="Node3D"]
+
+[node name="Chassis" type="StaticBody3D" parent="."]
+position = Vector3(0, 1.05, 0)
+collision_layer = 32
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="Chassis"]
+mesh = SubResource("Box1Mesh")
+
+[node name="Collision" type="CollisionShape3D" parent="Chassis"]
+shape = SubResource("Box1Shape")
+
+[node name="Cabin" type="StaticBody3D" parent="."]
+position = Vector3(0, 1.53, -0.4)
+collision_layer = 32
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="Cabin"]
+mesh = SubResource("Box2Mesh")
+
+[node name="Collision" type="CollisionShape3D" parent="Cabin"]
+shape = SubResource("Box2Shape")
+
+[node name="Windshield" type="MeshInstance3D" parent="."]
+position = Vector3(0, 1.57, 0.431)
+mesh = SubResource("Box3Mesh")
+
+[node name="Hood" type="MeshInstance3D" parent="."]
+position = Vector3(0, 1.25, 1.13)
+mesh = SubResource("Box4Mesh")
+
+[node name="FrontBumper" type="StaticBody3D" parent="."]
+position = Vector3(0, 0.96, 1.76)
+collision_layer = 32
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="FrontBumper"]
+mesh = SubResource("Box5Mesh")
+
+[node name="Collision" type="CollisionShape3D" parent="FrontBumper"]
+shape = SubResource("Box5Shape")
+
+[node name="LeftHeadlight" type="MeshInstance3D" parent="."]
+position = Vector3(-0.57, 1.1, 1.715)
+mesh = SubResource("Box6Mesh")
+
+[node name="RightHeadlight" type="MeshInstance3D" parent="."]
+position = Vector3(0.57, 1.1, 1.715)
+mesh = SubResource("Box7Mesh")
+
+[node name="StandLeftRear" type="StaticBody3D" parent="."]
+position = Vector3(-0.55, 0.4, -1.1)
+collision_layer = 32
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="StandLeftRear"]
+mesh = SubResource("Box8Mesh")
+
+[node name="Collision" type="CollisionShape3D" parent="StandLeftRear"]
+shape = SubResource("Box8Shape")
+
+[node name="StandLeftFront" type="StaticBody3D" parent="."]
+position = Vector3(-0.55, 0.4, 1.1)
+collision_layer = 32
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="StandLeftFront"]
+mesh = SubResource("Box9Mesh")
+
+[node name="Collision" type="CollisionShape3D" parent="StandLeftFront"]
+shape = SubResource("Box9Shape")
+
+[node name="StandRightRear" type="StaticBody3D" parent="."]
+position = Vector3(0.55, 0.4, -1.1)
+collision_layer = 32
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="StandRightRear"]
+mesh = SubResource("Box10Mesh")
+
+[node name="Collision" type="CollisionShape3D" parent="StandRightRear"]
+shape = SubResource("Box10Shape")
+
+[node name="StandRightFront" type="StaticBody3D" parent="."]
+position = Vector3(0.55, 0.4, 1.1)
+collision_layer = 32
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="StandRightFront"]
+mesh = SubResource("Box11Mesh")
+
+[node name="Collision" type="CollisionShape3D" parent="StandRightFront"]
+shape = SubResource("Box11Shape")
+
+[node name="RearLeft" type="MeshInstance3D" parent="."]
+position = Vector3(-1, 0.8, -1.1)
+rotation = Vector3(0, 0, 1.5707963)
+mesh = SubResource("FixedWheelMesh")
+material_override = SubResource("FixedWheelMaterial")
+
+[node name="RearRight" type="MeshInstance3D" parent="."]
+position = Vector3(1, 0.8, -1.1)
+rotation = Vector3(0, 0, 1.5707963)
+mesh = SubResource("FixedWheelMesh")
+material_override = SubResource("FixedWheelMaterial")
+
+[node name="FrontRight" type="MeshInstance3D" parent="."]
+position = Vector3(1, 0.8, 1.1)
+rotation = Vector3(0, 0, 1.5707963)
+mesh = SubResource("FixedWheelMesh")
+material_override = SubResource("FixedWheelMaterial")
+
+[node name="WheelSocket" parent="." instance=ExtResource("1")]
+position = Vector3(-1, 0.8, 1.1)

@@ -1,0 +1,68 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://parts/automotive_part.gd" id="1"]
+
+[ext_resource type="Script" path="res://systems/interaction_audio.gd" id="2"]
+
+[sub_resource type="StandardMaterial3D" id="TireMaterial"]
+albedo_color = Color(0.045, 0.05, 0.055, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="RimMaterial"]
+albedo_color = Color(0.65, 0.7, 0.72, 1)
+metallic = 0.7
+roughness = 0.3
+
+[sub_resource type="CylinderMesh" id="TireMesh"]
+material = SubResource("TireMaterial")
+top_radius = 0.42
+bottom_radius = 0.42
+height = 0.24
+radial_segments = 32
+
+[sub_resource type="CylinderMesh" id="RimMesh"]
+material = SubResource("RimMaterial")
+top_radius = 0.27
+bottom_radius = 0.27
+height = 0.25
+
+[sub_resource type="CylinderShape3D" id="WheelShape"]
+radius = 0.42
+height = 0.25
+
+[sub_resource type="PhysicsMaterial" id="WheelPhysics"]
+friction = 0.9
+bounce = 0.05
+
+[node name="WheelPrototype" type="RigidBody3D" node_paths=PackedStringArray("interaction_audio")]
+mass = 12.0
+physics_material_override = SubResource("WheelPhysics")
+collision_layer = 2
+collision_mask = 59
+continuous_cd = true
+script = ExtResource("1")
+display_name = "Roda"
+part_id = &"front_left_wheel"
+part_type = &"wheel"
+compatible_socket_types = Array[StringName]([&"wheel_hub"])
+required_fasteners = 5
+interaction_audio = NodePath("Audio")
+linear_damp = 0.15
+angular_damp = 0.5
+carry_radius = 0.46
+
+[node name="Tire" type="MeshInstance3D" parent="."]
+rotation = Vector3(0, 0, 1.5707963)
+mesh = SubResource("TireMesh")
+
+[node name="Rim" type="MeshInstance3D" parent="."]
+rotation = Vector3(0, 0, 1.5707963)
+mesh = SubResource("RimMesh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+rotation = Vector3(0, 0, 1.5707963)
+shape = SubResource("WheelShape")
+
+[node name="Audio" type="AudioStreamPlayer3D" parent="."]
+script = ExtResource("2")
+max_distance = 8.0

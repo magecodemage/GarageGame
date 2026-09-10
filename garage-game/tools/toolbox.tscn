@@ -1,0 +1,99 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://tools/toolbox.gd" id="1"]
+[ext_resource type="PackedScene" path="res://tools/wrench.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://tools/tool_slot.tscn" id="3"]
+
+[sub_resource type="StandardMaterial3D" id="Material"]
+albedo_color = Color(0.3, 0.12, 0.08, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="BaseMesh"]
+size = Vector3(2.8, 0.08, 0.98)
+material = SubResource("Material")
+
+[sub_resource type="BoxShape3D" id="BaseShape"]
+size = Vector3(2.8, 0.08, 0.98)
+
+[sub_resource type="BoxMesh" id="EdgeMesh"]
+size = Vector3(2.8, 0.13, 0.04)
+material = SubResource("Material")
+
+[sub_resource type="BoxShape3D" id="EdgeShape"]
+size = Vector3(2.8, 0.13, 0.04)
+
+[sub_resource type="BoxMesh" id="SideMesh"]
+size = Vector3(0.04, 0.13, 0.98)
+material = SubResource("Material")
+
+[sub_resource type="BoxShape3D" id="SideShape"]
+size = Vector3(0.04, 0.13, 0.98)
+
+[sub_resource type="BoxMesh" id="LidMesh"]
+size = Vector3(2.8, 0.03, 0.98)
+material = SubResource("Material")
+
+[sub_resource type="BoxShape3D" id="LidShape"]
+size = Vector3(2.8, 0.03, 0.98)
+
+[node name="Toolbox" type="StaticBody3D" node_paths=PackedStringArray("lid", "lid_body")]
+collision_layer = 1
+collision_mask = 0
+script = ExtResource("1")
+tool_scene = ExtResource("2")
+slot_scene = ExtResource("3")
+lid = NodePath("LidPivot")
+lid_body = NodePath("LidPivot/LidBody")
+
+[node name="BaseMesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("BaseMesh")
+
+[node name="BaseShape" type="CollisionShape3D" parent="."]
+shape = SubResource("BaseShape")
+
+[node name="FrontMesh" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.075, 0.49)
+mesh = SubResource("EdgeMesh")
+
+[node name="FrontShape" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.075, 0.49)
+shape = SubResource("EdgeShape")
+
+[node name="BackMesh" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.075, -0.49)
+mesh = SubResource("EdgeMesh")
+
+[node name="BackShape" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.075, -0.49)
+shape = SubResource("EdgeShape")
+
+[node name="LeftMesh" type="MeshInstance3D" parent="."]
+position = Vector3(-1.4, 0.075, 0)
+mesh = SubResource("SideMesh")
+
+[node name="LeftShape" type="CollisionShape3D" parent="."]
+position = Vector3(-1.4, 0.075, 0)
+shape = SubResource("SideShape")
+
+[node name="RightMesh" type="MeshInstance3D" parent="."]
+position = Vector3(1.4, 0.075, 0)
+mesh = SubResource("SideMesh")
+
+[node name="RightShape" type="CollisionShape3D" parent="."]
+position = Vector3(1.4, 0.075, 0)
+shape = SubResource("SideShape")
+
+[node name="LidPivot" type="Node3D" parent="."]
+position = Vector3(0, 0.15, -0.49)
+
+[node name="LidBody" type="StaticBody3D" parent="LidPivot"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="LidMesh" type="MeshInstance3D" parent="LidPivot/LidBody"]
+position = Vector3(0, 0, 0.49)
+mesh = SubResource("LidMesh")
+
+[node name="LidShape" type="CollisionShape3D" parent="LidPivot/LidBody"]
+position = Vector3(0, 0, 0.49)
+shape = SubResource("LidShape")

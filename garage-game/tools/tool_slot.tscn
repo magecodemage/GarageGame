@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://tools/tool_slot.gd" id="1"]
+
+[sub_resource type="BoxShape3D" id="Shape"]
+size = Vector3(0.25, 0.24, 0.4)
+
+[sub_resource type="BoxMesh" id="PreviewMesh"]
+size = Vector3(0.16, 0.012, 0.39)
+
+[sub_resource type="StandardMaterial3D" id="Material"]
+transparency = 1
+albedo_color = Color(0.7, 0.6, 0.3, 0.15)
+emission_enabled = true
+
+[node name="ToolSlot" type="Area3D" node_paths=PackedStringArray("installation_point", "preview")]
+collision_layer = 0
+collision_mask = 16
+script = ExtResource("1")
+snap_distance = 0.3
+installation_point = NodePath("InstallationPoint")
+preview = NodePath("Preview")
+
+[node name="InstallationPoint" type="Marker3D" parent="."]
+
+[node name="Preview" type="MeshInstance3D" parent="."]
+position = Vector3(0, -0.027, 0)
+mesh = SubResource("PreviewMesh")
+material_override = SubResource("Material")
+
+[node name="Shape" type="CollisionShape3D" parent="."]
+shape = SubResource("Shape")
