@@ -44,14 +44,32 @@ func is_compatible(_item: Grabbable) -> bool:
 
 
 func can_snap(item: Grabbable) -> bool:
-	if not is_instance_valid(item) or occupied or not is_accessible() or not is_compatible(item):
-		return false
-	if not item.is_held or item.global_position.distance_to(installation_point.global_position) > snap_distance:
-		return false
+	return get_snap_evaluation(item)["allowed"]
+
+
+func get_snap_evaluation(item: Grabbable) -> Dictionary:
+	if not is_instance_valid(item):
+		return {"allowed": false, "reason": "Item inválido."}
+	if occupied:
+		return {"allowed": false, "reason": "Encaixe ocupado."}
+	if not is_accessible():
+		return {"allowed": false, "reason": "Encaixe inacessível."}
+	if not is_compatible(item):
+		return {"allowed": false, "reason": "Peça incompatível."}
+	if item is AutomotivePart:
+		var dependency_result: Dictionary = item.can_install(self as PartSocket)
+		if not dependency_result["allowed"]:
+			return dependency_result
+	if not item.is_held:
+		return {"allowed": false, "reason": "Segure a peça para instalar."}
+	if item.global_position.distance_to(installation_point.global_position) > snap_distance:
+		return {"allowed": false, "reason": "Aproxime a peça do encaixe."}
 	# Não permite snap através de paredes ou do chassi.
 	var query := PhysicsRayQueryParameters3D.create(
 		item.global_position, installation_point.global_position, 33, [item.get_rid()])
-	return get_world_3d().direct_space_state.intersect_ray(query).is_empty()
+	if not get_world_3d().direct_space_state.intersect_ray(query).is_empty():
+		return {"allowed": false, "reason": "O encaixe está obstruído."}
+	return {"allowed": true, "reason": ""}
 
 
 func place_item(item: Grabbable, restoring: bool = false) -> bool:

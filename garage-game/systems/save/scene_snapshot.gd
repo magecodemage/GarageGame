@@ -1,7 +1,7 @@
 class_name SceneSnapshot
 extends RefCounted
 
-const VERSION: int = 1
+const VERSION: int = 2
 
 
 static func capture(registry: SceneRegistry, player: FirstPersonPlayer) -> Dictionary:
@@ -21,6 +21,7 @@ static func capture(registry: SceneRegistry, player: FirstPersonPlayer) -> Dicti
 			record["condition"] = item.condition
 			record["wear"] = item.wear
 			record["metadata"] = item.part_metadata.duplicate(true)
+			record["custom_state"] = item.get_custom_state().duplicate(true)
 		data["items"].append(record)
 	for fastener in registry.fasteners:
 		data["fasteners"].append({"id": str(fastener.fastener_id), "tightness": fastener.tightness,
@@ -42,6 +43,7 @@ static func apply(data: Dictionary, registry: SceneRegistry, player: FirstPerson
 			item.condition = float(record["condition"])
 			item.wear = float(record["wear"])
 			item.part_metadata = record["metadata"].duplicate(true)
+			item.apply_custom_state(record["custom_state"])
 	for record: Dictionary in data["toolboxes"]:
 		var toolbox := registry.nodes[StringName(record["id"])] as Toolbox
 		toolbox.set_open(record["open"])

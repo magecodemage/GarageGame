@@ -3,6 +3,7 @@ extends Node3D
 ## Grab físico limitado por força, velocidade e alcance. Sem parenting à câmera.
 
 signal held_changed(item: Grabbable)
+signal release_feedback(message: String)
 
 @export var camera: Camera3D
 @export var player_body: CharacterBody3D
@@ -19,6 +20,7 @@ signal held_changed(item: Grabbable)
 
 var held_item: Grabbable
 var candidate: SnapSocket
+var candidate_failure_reason: String = ""
 var _relative_basis := Basis.IDENTITY
 var _smoothed_target := Vector3.ZERO
 
@@ -75,11 +77,18 @@ func refresh_candidate() -> void:
 	if not is_instance_valid(held_item):
 		return
 	var closest: float = INF
+	var closest_rejected: float = INF
 	for node in get_tree().get_nodes_in_group("snap_sockets"):
 		var socket := node as SnapSocket
-		if not socket.can_snap(held_item):
-			continue
 		var distance: float = held_item.global_position.distance_squared_to(socket.installation_point.global_position)
+		if distance > socket.snap_distance * socket.snap_distance:
+			continue
+		var evaluation: Dictionary = socket.get_snap_evaluation(held_item)
+		if not evaluation["allowed"]:
+			if distance < closest_rejected:
+				closest_rejected = distance
+				candidate_failure_reason = evaluation["reason"]
+			continue
 		if distance < closest:
 			candidate = socket
 			closest = distance
@@ -95,6 +104,8 @@ func release(allow_snap: bool = true) -> void:
 	var did_snap: bool = allow_snap and candidate != null and candidate.place_item(item)
 	if not did_snap:
 		item.end_hold()
+		if allow_snap and not candidate_failure_reason.is_empty():
+			release_feedback.emit(candidate_failure_reason)
 	clearance.remove_exception(item)
 	held_item = null
 	_clear_candidate()
@@ -116,3 +127,4 @@ func _clear_candidate() -> void:
 	if is_instance_valid(candidate):
 		candidate.set_highlight(false)
 	candidate = null
+	candidate_failure_reason = ""

@@ -1,0 +1,87 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://parts/electrical/battery_part.gd" id="1"]
+[ext_resource type="Script" path="res://systems/mechanics/mechanical_dependency_set.gd" id="2"]
+[ext_resource type="Script" path="res://systems/electrical/electrical_component.gd" id="3"]
+
+[sub_resource type="Resource" id="Positive"]
+script = ExtResource("3")
+component_id = &"battery_positive_terminal"
+is_connected = true
+
+[sub_resource type="Resource" id="Negative"]
+script = ExtResource("3")
+component_id = &"battery_negative_terminal"
+is_connected = true
+
+[sub_resource type="Resource" id="Dependencies"]
+script = ExtResource("2")
+required_parts_installed = Array[StringName]([])
+blocking_parts = Array[StringName]([])
+required_parts_removed = Array[StringName]([])
+required_fasteners_loose = Array[StringName]([])
+
+[sub_resource type="StandardMaterial3D" id="Material"]
+albedo_color = Color(0.12, 0.14, 0.16, 1)
+roughness = 0.72
+
+[sub_resource type="BoxMesh" id="Mesh1"]
+size = Vector3(0.62, 0.42, 0.38)
+material = SubResource("Material")
+
+[sub_resource type="BoxShape3D" id="Shape1"]
+size = Vector3(0.62, 0.42, 0.38)
+
+[sub_resource type="StandardMaterial3D" id="PositiveMaterial"]
+albedo_color = Color(0.75, 0.08, 0.05, 1)
+metallic = 0.45
+
+[sub_resource type="StandardMaterial3D" id="NegativeMaterial"]
+albedo_color = Color(0.06, 0.07, 0.08, 1)
+metallic = 0.45
+
+[sub_resource type="CylinderMesh" id="TerminalMesh"]
+top_radius = 0.045
+bottom_radius = 0.045
+height = 0.07
+radial_segments = 12
+
+[node name="Battery" type="RigidBody3D"]
+collision_layer = 2
+collision_mask = 59
+continuous_cd = true
+linear_damp = 0.25
+angular_damp = 0.65
+script = ExtResource("1")
+display_name = "Bateria"
+part_id = &"battery"
+part_type = &"battery"
+compatible_socket_types = Array[StringName]([&"battery_mount"])
+required_fasteners = 2
+dependencies = SubResource("Dependencies")
+mass = 14
+carry_radius = 0.42
+voltage = 12.6
+charge = 1.0
+battery_positive_terminal = SubResource("Positive")
+battery_negative_terminal = SubResource("Negative")
+
+[node name="Visual1" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0, 0)
+rotation = Vector3(0, 0, 0)
+mesh = SubResource("Mesh1")
+
+[node name="Collision1" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0, 0)
+rotation = Vector3(0, 0, 0)
+shape = SubResource("Shape1")
+
+[node name="BatteryPositiveTerminal" type="MeshInstance3D" parent="."]
+position = Vector3(-0.2, 0.245, 0)
+mesh = SubResource("TerminalMesh")
+material_override = SubResource("PositiveMaterial")
+
+[node name="BatteryNegativeTerminal" type="MeshInstance3D" parent="."]
+position = Vector3(0.2, 0.245, 0)
+mesh = SubResource("TerminalMesh")
+material_override = SubResource("NegativeMaterial")

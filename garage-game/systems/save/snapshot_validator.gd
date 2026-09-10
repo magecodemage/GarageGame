@@ -46,6 +46,8 @@ static func validate(data: Dictionary, registry: SceneRegistry) -> String:
 					return "Condição/desgaste inválidos"
 			if not record.get("metadata") is Dictionary:
 				return "Metadados inválidos"
+			if not record.get("custom_state") is Dictionary:
+				return "Estado específico da peça inválido"
 	for value: Variant in data["fasteners"]:
 		if not _valid_record(value, registry, seen):
 			return "ID de parafuso ausente, desconhecido ou repetido"

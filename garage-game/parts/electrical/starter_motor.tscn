@@ -1,0 +1,76 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://parts/electrical/starter_motor_part.gd" id="1"]
+[ext_resource type="Script" path="res://systems/mechanics/mechanical_dependency_set.gd" id="2"]
+[ext_resource type="Script" path="res://systems/electrical/electrical_component.gd" id="3"]
+
+[sub_resource type="Resource" id="Electrical"]
+script = ExtResource("3")
+component_id = &"starter_motor_electrical"
+is_connected = true
+
+[sub_resource type="Resource" id="Dependencies"]
+script = ExtResource("2")
+required_parts_installed = Array[StringName]([])
+blocking_parts = Array[StringName]([])
+required_parts_removed = Array[StringName]([])
+required_fasteners_loose = Array[StringName]([])
+
+[sub_resource type="StandardMaterial3D" id="Material"]
+albedo_color = Color(0.35, 0.38, 0.4, 1)
+roughness = 0.72
+
+[sub_resource type="CylinderMesh" id="Mesh1"]
+top_radius = 0.17
+bottom_radius = 0.17
+height = 0.42
+radial_segments = 24
+material = SubResource("Material")
+
+[sub_resource type="CylinderShape3D" id="Shape1"]
+radius = 0.17
+height = 0.42
+
+[sub_resource type="BoxMesh" id="Mesh2"]
+size = Vector3(0.18, 0.17, 0.18)
+material = SubResource("Material")
+
+[sub_resource type="BoxShape3D" id="Shape2"]
+size = Vector3(0.18, 0.17, 0.18)
+
+[node name="StarterMotor" type="RigidBody3D"]
+collision_layer = 2
+collision_mask = 59
+continuous_cd = true
+linear_damp = 0.25
+angular_damp = 0.65
+script = ExtResource("1")
+display_name = "Motor de partida"
+part_id = &"starter_motor"
+part_type = &"starter_motor"
+compatible_socket_types = Array[StringName]([&"starter_mount"])
+required_fasteners = 2
+dependencies = SubResource("Dependencies")
+mass = 4.5
+carry_radius = 0.3
+electrical = SubResource("Electrical")
+
+[node name="Visual1" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0, 0)
+rotation = Vector3(0, 0, 1.5707963)
+mesh = SubResource("Mesh1")
+
+[node name="Visual2" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.2, 0)
+rotation = Vector3(0, 0, 0)
+mesh = SubResource("Mesh2")
+
+[node name="Collision1" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0, 0)
+rotation = Vector3(0, 0, 1.5707963)
+shape = SubResource("Shape1")
+
+[node name="Collision2" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.2, 0)
+rotation = Vector3(0, 0, 0)
+shape = SubResource("Shape2")

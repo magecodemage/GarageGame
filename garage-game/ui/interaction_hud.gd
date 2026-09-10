@@ -18,6 +18,7 @@ var _notice_until: int = 0
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	interaction.context_changed.connect(_on_context_changed)
+	interaction.action_feedback.connect(notify)
 
 
 func _process(_delta: float) -> void:

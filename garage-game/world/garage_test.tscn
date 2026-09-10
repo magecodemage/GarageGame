@@ -1,8 +1,7 @@
-[gd_scene load_steps=53 format=3]
+[gd_scene load_steps=52 format=3]
 
 [ext_resource type="PackedScene" path="res://player/player.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://vehicles/car_prototype.tscn" id="2"]
-[ext_resource type="PackedScene" path="res://parts/wheel_prototype.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://tools/toolbox.tscn" id="4"]
 [ext_resource type="Script" path="res://systems/save/save_system.gd" id="5"]
 [ext_resource type="Script" path="res://world/garage_session.gd" id="6"]
@@ -347,10 +346,6 @@ modulate = Color(1, 0.76, 0.32, 1)
 
 [node name="CarPrototype" parent="." instance=ExtResource("2")]
 position = Vector3(1, 0, -1)
-
-[node name="WheelPrototype" parent="." instance=ExtResource("3")]
-position = Vector3(-1.7, 0.2, 0.8)
-rotation = Vector3(0, 0, 1.5707963)
 
 [node name="Player" parent="." instance=ExtResource("1")]
 position = Vector3(-2.2, 0.05, 3)

@@ -15,6 +15,7 @@ enum State { FREE, HELD, PLACED, PARTIALLY_FASTENED, FASTENED }
 @export_range(0.0, 1.0) var condition: float = 1.0
 @export_range(0.0, 1.0) var wear: float = 0.0
 @export var part_metadata: Dictionary = {}
+@export var dependencies: MechanicalDependencySet
 @export var installation_position := Vector3.ZERO
 @export var installation_rotation_degrees := Vector3.ZERO
 
@@ -34,7 +35,28 @@ func get_persistent_id() -> StringName:
 
 
 func can_pick_up() -> bool:
-	return super.can_pick_up() and (not installed or placement_socket.can_remove())
+	return super.can_pick_up() and get_remove_evaluation()["allowed"]
+
+
+func can_install(_socket: PartSocket = null) -> Dictionary:
+	if not dependencies:
+		return {"allowed": true, "reason": ""}
+	return dependencies.evaluate_install(_mechanical_registry())
+
+
+func can_remove() -> Dictionary:
+	return get_remove_evaluation()
+
+
+func get_remove_evaluation() -> Dictionary:
+	if not installed:
+		return {"allowed": true, "reason": ""}
+	if not placement_socket.can_remove():
+		var count: int = placement_socket.get_tight_fastener_count()
+		return {"allowed": false, "reason": "Afrouxe os %d parafusos de %s." % [count, display_name]}
+	if dependencies:
+		return dependencies.evaluate_remove(_mechanical_registry())
+	return {"allowed": true, "reason": ""}
 
 
 func begin_hold(holder: PhysicsBody3D) -> bool:
@@ -72,6 +94,27 @@ func get_fastening_ratio() -> float:
 	return placement_socket.get_fastening_ratio() if installed else 0.0
 
 
+func is_secure() -> bool:
+	return installed and (required_fasteners == 0 or is_equal_approx(get_fastening_ratio(), 1.0))
+
+
+func is_partially_secure() -> bool:
+	var ratio := get_fastening_ratio()
+	return installed and ratio > 0.0 and ratio < 1.0
+
+
+func is_loose() -> bool:
+	return installed and not is_secure() and not is_partially_secure()
+
+
+func get_custom_state() -> Dictionary:
+	return {}
+
+
+func apply_custom_state(_data: Dictionary) -> void:
+	pass
+
+
 func refresh_fastening_state() -> void:
 	if not installed:
 		return
@@ -88,13 +131,39 @@ func _set_state(next_state: State) -> void:
 
 func interaction_context(held: RigidBody3D) -> Dictionary:
 	var result: Dictionary = super.interaction_context(held)
+	result["detail"] = _inspection_status()
 	if installed:
-		result["hint"] = "Segure LMB para remover" if can_pick_up() else (
-			"Afrouxe todos os %d parafusos" % required_fasteners)
-		result["detail"] = "%s · Fixação %.0f%%" % [State.keys()[state], fastening_ratio * 100.0]
-	result["debug"] += "\nTipo: %s\nEstado: %s\nSocket: %s\nCondição: %.2f" % [
-		part_type, State.keys()[state], placement_socket.socket_id if installed else "-", condition]
+		var evaluation := get_remove_evaluation()
+		result["hint"] = "Segure LMB para remover" if evaluation["allowed"] else evaluation["reason"]
+	result["debug"] += "\nClasse: %s\nTipo: %s\nEstado: %s\nSocket: %s\nFixação: %.2f\n%s" % [
+		_class_label(), part_type, State.keys()[state], placement_socket.socket_id if installed else "-",
+		fastening_ratio, dependencies.describe() if dependencies else "Sem dependências"]
 	return result
+
+
+func _inspection_status() -> String:
+	if not installed:
+		return "Livre"
+	if required_fasteners <= 0:
+		return "Instalada"
+	var secured: int = placement_socket.get_fully_tight_fastener_count()
+	return "%d/%d parafusos firmes · %s" % [secured, required_fasteners,
+		"Segura" if is_secure() else ("Parcial" if is_partially_secure() else "Solta")]
+
+
+func _mechanical_registry() -> Dictionary:
+	var states := get_tree().get_nodes_in_group("vehicle_mechanical_states")
+	if states.is_empty():
+		return {}
+	var mechanical_state := states[0] as VehicleMechanicalState
+	mechanical_state.rebuild()
+	return mechanical_state.registry
+
+
+func _class_label() -> String:
+	var source: Script = get_script()
+	var global_name: StringName = source.get_global_name()
+	return str(global_name) if not global_name.is_empty() else source.resource_path.get_file()
 
 
 func validate_configuration() -> PackedStringArray:

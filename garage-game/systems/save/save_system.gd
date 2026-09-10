@@ -5,7 +5,7 @@ signal feedback(message: String)
 
 @export var scene_root: Node3D
 @export var player: FirstPersonPlayer
-@export var save_path: String = "user://garage_slice_v1.json"
+@export var save_path: String = "user://garage_slice_v2.json"
 
 var registry := SceneRegistry.new()
 var initial_snapshot: Dictionary = {}

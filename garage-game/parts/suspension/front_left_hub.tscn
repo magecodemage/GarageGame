@@ -1,0 +1,52 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://parts/automotive_part.gd" id="1"]
+[ext_resource type="Script" path="res://systems/mechanics/mechanical_dependency_set.gd" id="2"]
+
+[sub_resource type="Resource" id="Dependencies"]
+script = ExtResource("2")
+required_parts_installed = Array[StringName]([&"front_left_strut"])
+blocking_parts = Array[StringName]([&"front_left_brake_disc", &"front_left_brake_caliper"])
+required_parts_removed = Array[StringName]([])
+required_fasteners_loose = Array[StringName]([])
+
+[sub_resource type="StandardMaterial3D" id="Material"]
+albedo_color = Color(0.38, 0.43, 0.46, 1)
+roughness = 0.72
+
+[sub_resource type="CylinderMesh" id="Mesh1"]
+top_radius = 0.25
+bottom_radius = 0.25
+height = 0.22
+radial_segments = 24
+material = SubResource("Material")
+
+[sub_resource type="CylinderShape3D" id="Shape1"]
+radius = 0.25
+height = 0.22
+
+[node name="FrontLeftHub" type="RigidBody3D"]
+collision_layer = 2
+collision_mask = 59
+continuous_cd = true
+linear_damp = 0.25
+angular_damp = 0.65
+script = ExtResource("1")
+display_name = "Cubo dianteiro esquerdo"
+part_id = &"front_left_hub"
+part_type = &"wheel_hub"
+compatible_socket_types = Array[StringName]([&"hub_mount"])
+required_fasteners = 2
+dependencies = SubResource("Dependencies")
+mass = 8
+carry_radius = 0.3
+
+[node name="Visual1" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0, 0)
+rotation = Vector3(0, 0, 1.5707963)
+mesh = SubResource("Mesh1")
+
+[node name="Collision1" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0, 0)
+rotation = Vector3(0, 0, 1.5707963)
+shape = SubResource("Shape1")

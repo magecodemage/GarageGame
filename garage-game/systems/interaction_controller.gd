@@ -3,6 +3,7 @@ extends Node
 ## O collider fornece as ações; este componente só coordena entrada, alvo e hold.
 
 signal context_changed(context: Dictionary)
+signal action_feedback(message: String)
 
 @export var ray: RayCast3D
 @export var carrier: PartCarrier
@@ -19,6 +20,7 @@ var _ray_ignored_item: Grabbable
 func _ready() -> void:
 	ray.add_exception(player_body)
 	carrier.held_changed.connect(_on_held_changed)
+	carrier.release_feedback.connect(func(message: String) -> void: action_feedback.emit(message))
 
 
 func _physics_process(delta: float) -> void:
@@ -34,12 +36,21 @@ func _physics_process(delta: float) -> void:
 		var body: RigidBody3D = target.primary()
 		if body is Grabbable:
 			carrier.pick_up(body)
+		else:
+			var blocked_context: Dictionary = target.context(carrier.held_item)
+			var reason: String = blocked_context.get("hint", "")
+			if not reason.is_empty():
+				action_feedback.emit(reason)
 	if not primary_down and is_instance_valid(carrier.held_item):
 		carrier.release()
 	_was_primary_down = primary_down
 	for direction in _scroll_steps:
 		if target:
-			target.scroll(carrier.held_item, direction)
+			if not target.scroll(carrier.held_item, direction):
+				var scroll_context: Dictionary = target.context(carrier.held_item)
+				var scroll_reason: String = scroll_context.get("hint", "")
+				if not scroll_reason.is_empty():
+					action_feedback.emit(scroll_reason)
 	_scroll_steps.clear()
 	emit_context()
 

@@ -11,6 +11,7 @@ var toolbox: Toolbox
 var carrier: PartCarrier
 var interaction: InteractionController
 var save: SaveSystem
+var mechanical_state: VehicleMechanicalState
 var last_context: Dictionary = {}
 
 
@@ -102,17 +103,33 @@ func capture(file_name: String) -> void:
 		root.get_texture().get_image().save_png("res://.godot/slice_" + file_name + ".png")
 
 
+func part(id: StringName) -> AutomotivePart:
+	mechanical_state.rebuild()
+	return mechanical_state.get_part(id)
+
+
+func socket_by_id(id: StringName) -> PartSocket:
+	save.registry.rebuild(garage)
+	return save.registry.nodes[id] as PartSocket
+
+
+func tool_by_size(size: int) -> Tool:
+	for tool in toolbox.tools:
+		if tool.tool_size == size:
+			return tool
+	return null
+
+
 func run() -> void:
 	garage = (load("res://world/garage_test.tscn") as PackedScene).instantiate() as Node3D
 	root.add_child(garage)
 	current_scene = garage
 	player = garage.get_node("Player") as FirstPersonPlayer
-	wheel = garage.get_node("WheelPrototype") as AutomotivePart
-	socket = garage.get_node("CarPrototype/WheelSocket") as PartSocket
 	toolbox = garage.get_node("Toolbox") as Toolbox
 	carrier = player.interaction.carrier
 	interaction = player.interaction
 	save = garage.get_node("SaveSystem") as SaveSystem
+	mechanical_state = garage.get_node("CarPrototype/MechanicalState") as VehicleMechanicalState
 	save.save_path = "user://garage_slice_validation.json"
 	player.set_process_unhandled_input(false)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -121,9 +138,18 @@ func run() -> void:
 	player.set_controls_enabled(true)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	await frames(30)
+	mechanical_state.rebuild()
+	wheel = part(&"front_left_wheel")
+	socket = socket_by_id(&"front_left_wheel_socket")
 	check(save.validate_scene(), "Registro sem IDs duplicados/configurações inválidas")
 	check(toolbox.tools.size() == 12 and toolbox.slots.size() == 12, "Caixa contém 12 chaves e 12 slots")
 	check(socket.fasteners.size() == 5, "Roda possui cinco parafusos independentes")
+	check(mechanical_state.get_parts().size() == 10, "Veículo registra dez peças mecânicas")
+	var used_sizes: Dictionary = {}
+	for fastener in garage.get_tree().get_nodes_in_group("fasteners"):
+		used_sizes[fastener.required_tool_size] = true
+	check([8, 10, 12, 13, 14, 17, 19].all(func(size: int) -> bool: return used_sizes.has(size)),
+		"Conjunto mecânico usa todas as sete chaves requeridas")
 	check(player.is_on_floor(), "Player apoiado no piso")
 	_check_input_map()
 	await capture("initial")

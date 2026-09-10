@@ -1,8 +1,13 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://parts/automotive_part.gd" id="1"]
 
 [ext_resource type="Script" path="res://systems/interaction_audio.gd" id="2"]
+[ext_resource type="Script" path="res://systems/mechanics/mechanical_dependency_set.gd" id="3"]
+
+[sub_resource type="Resource" id="Dependencies"]
+script = ExtResource("3")
+required_parts_installed = Array[StringName]([&"front_left_hub", &"front_left_brake_disc"])
 
 [sub_resource type="StandardMaterial3D" id="TireMaterial"]
 albedo_color = Color(0.045, 0.05, 0.055, 1)
@@ -50,6 +55,7 @@ interaction_audio = NodePath("Audio")
 linear_damp = 0.15
 angular_damp = 0.5
 carry_radius = 0.46
+dependencies = SubResource("Dependencies")
 
 [node name="Tire" type="MeshInstance3D" parent="."]
 rotation = Vector3(0, 0, 1.5707963)

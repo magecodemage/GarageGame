@@ -37,4 +37,8 @@ func rebuild(scene: Node) -> bool:
 			toolboxes.append(node)
 		if node.has_method("validate_configuration"):
 			issues.append_array(node.validate_configuration())
+	for state_node in scene.get_tree().get_nodes_in_group("vehicle_mechanical_states"):
+		if scene.is_ancestor_of(state_node):
+			state_node.rebuild()
+			issues.append_array(state_node.validate_dependencies(nodes))
 	return issues.is_empty()

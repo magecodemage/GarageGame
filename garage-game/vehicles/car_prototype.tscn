@@ -1,6 +1,8 @@
-[gd_scene load_steps=33 format=3]
+[gd_scene load_steps=36 format=3]
 
-[ext_resource type="PackedScene" path="res://vehicles/wheel_socket.tscn" id="1"]
+[ext_resource type="PackedScene" path="res://vehicles/front_left_assembly.tscn" id="1"]
+[ext_resource type="PackedScene" path="res://vehicles/engine_bay_prototype.tscn" id="2"]
+[ext_resource type="Script" path="res://vehicles/vehicle_mechanical_state.gd" id="3"]
 [sub_resource type="StandardMaterial3D" id="Box1Material"]
 albedo_color = Color(0.12, 0.3, 0.32, 1)
 roughness = 0.8
@@ -120,6 +122,11 @@ albedo_color = Color(0.065, 0.07, 0.08, 1)
 
 [node name="CarPrototype" type="Node3D"]
 
+[node name="MechanicalState" type="Node" parent="."]
+script = ExtResource("3")
+vehicle_id = &"car_prototype"
+critical_part_ids = Array[StringName]([&"front_left_strut", &"front_left_hub", &"front_left_brake_disc", &"front_left_brake_caliper", &"front_left_wheel", &"battery", &"radiator", &"air_filter_box", &"alternator", &"starter_motor"])
+
 [node name="Chassis" type="StaticBody3D" parent="."]
 position = Vector3(0, 1.05, 0)
 collision_layer = 32
@@ -147,7 +154,8 @@ position = Vector3(0, 1.57, 0.431)
 mesh = SubResource("Box3Mesh")
 
 [node name="Hood" type="MeshInstance3D" parent="."]
-position = Vector3(0, 1.25, 1.13)
+position = Vector3(0, 2.02, 0.55)
+rotation_degrees = Vector3(-68, 0, 0)
 mesh = SubResource("Box4Mesh")
 
 [node name="FrontBumper" type="StaticBody3D" parent="."]
@@ -231,5 +239,6 @@ rotation = Vector3(0, 0, 1.5707963)
 mesh = SubResource("FixedWheelMesh")
 material_override = SubResource("FixedWheelMaterial")
 
-[node name="WheelSocket" parent="." instance=ExtResource("1")]
-position = Vector3(-1, 0.8, 1.1)
+[node name="FrontLeftAssembly" parent="." instance=ExtResource("1")]
+
+[node name="EngineBayPrototype" parent="." instance=ExtResource("2")]

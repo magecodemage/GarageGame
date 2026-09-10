@@ -1,0 +1,49 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://parts/intake/air_filter_box_part.gd" id="1"]
+[ext_resource type="Script" path="res://systems/mechanics/mechanical_dependency_set.gd" id="2"]
+
+[sub_resource type="Resource" id="Dependencies"]
+script = ExtResource("2")
+required_parts_installed = Array[StringName]([])
+blocking_parts = Array[StringName]([])
+required_parts_removed = Array[StringName]([])
+required_fasteners_loose = Array[StringName]([])
+
+[sub_resource type="StandardMaterial3D" id="Material"]
+albedo_color = Color(0.11, 0.13, 0.14, 1)
+roughness = 0.72
+
+[sub_resource type="BoxMesh" id="Mesh1"]
+size = Vector3(0.52, 0.28, 0.44)
+material = SubResource("Material")
+
+[sub_resource type="BoxShape3D" id="Shape1"]
+size = Vector3(0.52, 0.28, 0.44)
+
+[node name="AirFilterBox" type="RigidBody3D"]
+collision_layer = 2
+collision_mask = 59
+continuous_cd = true
+linear_damp = 0.25
+angular_damp = 0.65
+script = ExtResource("1")
+display_name = "Caixa do filtro de ar"
+part_id = &"air_filter_box"
+part_type = &"air_filter_box"
+compatible_socket_types = Array[StringName]([&"air_filter_mount"])
+required_fasteners = 2
+dependencies = SubResource("Dependencies")
+mass = 2.4
+carry_radius = 0.36
+air_filter_condition = 0.92
+
+[node name="Visual1" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0, 0)
+rotation = Vector3(0, 0, 0)
+mesh = SubResource("Mesh1")
+
+[node name="Collision1" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0, 0)
+rotation = Vector3(0, 0, 0)
+shape = SubResource("Shape1")
