@@ -1,0 +1,126 @@
+{
+  "valid": true,
+  "phase": "01_BODY_BASE",
+  "control_vertices": 471,
+  "control_faces": 370,
+  "dimensions_m": {
+    "length": 4.14900016784668,
+    "width": 1.7350000143051147,
+    "height": 1.4390000104904175
+  },
+  "approx_ground_clearance_m": 0.33500000834465027,
+  "quad_ratio": 1.0,
+  "errors": [],
+  "checks": [
+    {
+      "name": "collection:REFERENCES",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "collection:BODY",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "collection:REMOVABLE_BODY",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "collection:GLASS",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "collection:INTERIOR",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "collection:MECHANICAL",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "collection:HELPERS",
+      "ok": true,
+      "detail": "present"
+    },
+    {
+      "name": "modifier_order",
+      "ok": true,
+      "detail": "['MIRROR', 'SUBSURF']"
+    },
+    {
+      "name": "dimension:length",
+      "ok": true,
+      "detail": "4.1490 m (target 4.1490)"
+    },
+    {
+      "name": "dimension:width",
+      "ok": true,
+      "detail": "1.7350 m (target 1.7350)"
+    },
+    {
+      "name": "dimension:height",
+      "ok": true,
+      "detail": "1.4390 m (target 1.4390)"
+    },
+    {
+      "name": "approx_ground_clearance",
+      "ok": true,
+      "detail": "0.3350 m shell lower boundary"
+    },
+    {
+      "name": "editable_half_mesh",
+      "ok": true,
+      "detail": "min X 0.000000"
+    },
+    {
+      "name": "quad_ratio",
+      "ok": true,
+      "detail": "1.000 (370/370)"
+    },
+    {
+      "name": "wheelbase",
+      "ok": true,
+      "detail": "2.5110 m"
+    },
+    {
+      "name": "front_track",
+      "ok": true,
+      "detail": "1.5130 m"
+    },
+    {
+      "name": "rear_track",
+      "ok": true,
+      "detail": "1.4940 m"
+    },
+    {
+      "name": "front_axle_y",
+      "ok": true,
+      "detail": "-1.2555 m"
+    },
+    {
+      "name": "rear_axle_y",
+      "ok": true,
+      "detail": "1.2555 m"
+    },
+    {
+      "name": "wheel_center_z",
+      "ok": true,
+      "detail": "0.3150 m"
+    },
+    {
+      "name": "orthographic_references",
+      "ok": true,
+      "detail": "4 configured image planes"
+    },
+    {
+      "name": "legacy_helpers_preserved",
+      "ok": true,
+      "detail": "19 helpers"
+    }
+  ]
+}

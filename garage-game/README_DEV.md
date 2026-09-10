@@ -314,3 +314,80 @@ inválidos são esperados; erros de parser/runtime não são.
 Ainda precisam de avaliação manual: conforto da sensibilidade, precisão ao mirar
 em fasteners próximos, sensação de peso/jitter, manipulação junto ao jogador e
 paredes e legibilidade do HUD em diferentes resoluções.
+
+## Visual master da carroceria — fase 01
+
+O protótipo procedural anterior continua preservado em `blender/source/car_main.blend`
+e `blender/exports/car_main.glb`. Uma cópia congelada também existe em
+`blender/backups/procedural_20260910/`. O script `blender/scripts/build_car.py`
+é agora identificado como pipeline legado e continua escrevendo somente esses
+arquivos antigos.
+
+O novo arquivo definitivo para edição visual é
+`blender/source/car_visual_master.blend`. Ele usa X para largura, Y para
+comprimento (frente em -Y) e Z para altura. A cena está separada em
+`REFERENCES`, `BODY`, `REMOVABLE_BODY`, `GLASS`, `INTERIOR`, `MECHANICAL` e
+`HELPERS`; `LEGACY_PROTOTYPE` guarda o shell antigo oculto e
+`VALIDATION_GUIDES` guarda contornos e limites de painéis que não aparecem nos
+renders normais.
+
+`body_shell_accuracy` é uma half-mesh em +X com Mirror como primeiro modificador
+e Subdivision depois dele. A cage atual tem 471 vértices, 370 faces e 100% de
+quads. Os arcos de roda pertencem à borda da própria carroceria. Para-brisa,
+vidro traseiro e duas aberturas laterais por lado são vazios topológicos; os
+pilares A/B/C e os trilhos do teto permanecem no mesmo shell.
+
+As imagens originais fornecidas no chat não estavam disponíveis como arquivos
+locais. Por isso `blender/references/generated_guides/` contém guias vetoriais
+reconstruídas a partir do blueprint e das silhuetas fornecidas. Elas são planos
+IMAGE não renderizáveis na collection `REFERENCES`; não são cópias redistribuídas
+das fotografias.
+
+Dimensões validadas:
+
+| Medida | Valor |
+|---|---:|
+| Comprimento | 4,149 m |
+| Largura | 1,735 m |
+| Altura | 1,439 m |
+| Entre-eixos | 2,511 m |
+| Bitola dianteira | 1,513 m |
+| Bitola traseira | 1,494 m |
+| Centro das rodas em Z | 0,315 m |
+| Limite inferior aproximado do shell | 0,335 m |
+
+O fluxo novo é:
+
+```text
+referências -> car_visual_master.blend -> validação -> helpers -> export opcional -> Godot
+```
+
+`bootstrap_visual_master.py` foi usado uma vez para criar a cage inicial. Ele se
+recusa a sobrescrever o master sem `--force-bootstrap` e não faz parte do fluxo
+normal. A partir deste marco, a carroceria deve ser refinada diretamente no
+`.blend`. `visual_master_pipeline.py` somente valida e renderiza; não recria a
+geometria. `export_visual_master.py` é opcional e ainda não foi executado nem
+integrado ao Godot nesta fase.
+
+Para validar e atualizar os previews sem modificar a forma:
+
+```text
+blender --background blender/source/car_visual_master.blend --python blender/scripts/accuracy/visual_master_pipeline.py
+```
+
+O relatório fica em `blender/reports/body_accuracy.json`. Os previews ortográficos,
+três-quartos e overlays dimensionais ficam em `blender/previews_accuracy/`.
+
+**MANUAL MODELING RECOMMENDED:** antes de separar painéis, refine no objeto
+`body_shell_accuracy` os loops do encontro capô/paralama e da face dianteira nas
+vistas FRONT e FRONT_3Q; ajuste os loops do pilar A e da borda inferior do
+para-brisa nas vistas SIDE e FRONT_3Q; refine os loops do pilar C, canto superior
+do hatch e transição para o quarto traseiro nas vistas SIDE e REAR_3Q; e ajuste
+a curvatura dos loops de lábio dos quatro arcos nas vistas SIDE/FRONT/REAR. As
+correções devem aproximar os raios de canto, dar espessura final aos vãos e
+remover a suavização genérica que ainda existe no blockout. Os contornos globais,
+eixos e medidas devem permanecer fixos.
+
+Esta fase termina na carroceria-base. Separação de capô, portas, hatch,
+para-choques, faróis, vidros finais, interior, cofre e integração no Godot ficam
+para uma fase posterior à aprovação dos renders.

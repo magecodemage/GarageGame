@@ -1,4 +1,9 @@
-"""Idempotent entry point for building, validating, rendering and exporting."""
+"""LEGACY procedural prototype pipeline.
+
+This script remains reproducible for car_main.blend/car_main.glb, but it is not
+the definitive visual workflow.  The accuracy master is edited directly in
+car_visual_master.blend and only validated/rendered by scripts/accuracy.
+"""
 
 import bpy
 import os
@@ -44,6 +49,7 @@ def build():
 
 
 def main():
+    print("LEGACY PROCEDURAL PIPELINE: output is a preserved prototype, not the visual master")
     project_blender = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
     source = os.path.join(project_blender, "source", "car_main.blend")
     preview_dir = os.path.join(project_blender, "previews")
@@ -62,4 +68,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
