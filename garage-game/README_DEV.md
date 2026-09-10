@@ -55,7 +55,48 @@ tools/                  ferramentas, slots e toolbox
 vehicles/               sockets, fasteners e conjuntos do veículo
 world/                   garagem e atalhos da sessão
 ui/                      HUD e mensagens temporárias
+blender/                 fonte, export, previews e geradores do carro
 ```
+
+## Carro visual intermediário
+
+`vehicles/car_visual.tscn` carrega `blender/exports/car_main.glb` com
+`GLTFDocument` como camada visual do `CarPrototype`. Isso evita depender de um
+cache de import já existente em checkouts limpos. O chassi, o estado mecânico,
+os sockets, as colisões e
+as peças interativas continuam no Godot. `CarVisualBridge` abre o capô visual e
+oculta no GLB a roda dianteira esquerda, seu conjunto de freio/suspensão e os
+componentes do cofre que já possuem uma instância funcional no gameplay. Assim,
+remover uma dessas peças não deixa uma cópia visual fixa.
+
+O asset é um hatch fictício inspirado somente nas proporções e arquitetura de
+hatches europeus de 2000–2005. Não contém marca, emblema ou badge real. A escala
+é métrica, a frente do arquivo Blender aponta para `-Y` e a conversão glTF a
+alinha com `+Z` na cena atual do Godot.
+
+Arquivos principais:
+
+```text
+blender/source/car_main.blend       fonte editável
+blender/exports/car_main.glb        asset usado pelo Godot
+blender/previews/*.png              vistas de validação
+blender/scripts/build_car.py        geração idempotente completa
+blender/scripts/validate_model.py   nomes, escala, pivôs e triângulos
+```
+
+Para reconstruir com a instalação detectada nesta máquina:
+
+```powershell
+& "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" `
+  --background --python blender/scripts/build_car.py
+```
+
+Os módulos `create_body.py`, `create_wheels.py`, `create_interior.py`,
+`create_engine_bay.py`, `create_mechanical_parts.py` e `create_sockets.py`
+podem ser alterados separadamente. `car_dimensions.py` concentra as dimensões e
+posições dos eixos. O build limpa somente a cena Blender que está gerando,
+recria os objetos com nomes estáveis, valida, salva o `.blend`, renderiza os
+previews e exporta o GLB.
 
 ## Dependências mecânicas
 

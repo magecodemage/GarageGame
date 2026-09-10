@@ -1,4 +1,4 @@
-[gd_scene load_steps=43 format=3]
+[gd_scene load_steps=44 format=3]
 
 [ext_resource type="PackedScene" path="res://vehicles/front_left_assembly.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://vehicles/engine_bay_prototype.tscn" id="2"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://systems/engine/ignition_system.gd" id="7"]
 [ext_resource type="Script" path="res://systems/engine/engine_audio.gd" id="8"]
 [ext_resource type="Script" path="res://systems/engine/engine_controller.gd" id="9"]
+[ext_resource type="PackedScene" path="res://vehicles/car_visual.tscn" id="10"]
 [sub_resource type="StandardMaterial3D" id="Box1Material"]
 albedo_color = Color(0.12, 0.3, 0.32, 1)
 roughness = 0.8
@@ -128,6 +129,9 @@ albedo_color = Color(0.065, 0.07, 0.08, 1)
 
 [node name="CarPrototype" type="Node3D"]
 
+[node name="CarVisual" parent="." instance=ExtResource("10")]
+position = Vector3(0, 0.485, 0)
+
 [node name="MechanicalState" type="Node" parent="."]
 script = ExtResource("3")
 vehicle_id = &"car_prototype"
@@ -187,6 +191,7 @@ collision_layer = 32
 collision_mask = 0
 
 [node name="Mesh" type="MeshInstance3D" parent="Chassis"]
+visible = false
 mesh = SubResource("Box1Mesh")
 
 [node name="Collision" type="CollisionShape3D" parent="Chassis"]
@@ -198,16 +203,19 @@ collision_layer = 32
 collision_mask = 0
 
 [node name="Mesh" type="MeshInstance3D" parent="Cabin"]
+visible = false
 mesh = SubResource("Box2Mesh")
 
 [node name="Collision" type="CollisionShape3D" parent="Cabin"]
 shape = SubResource("Box2Shape")
 
 [node name="Windshield" type="MeshInstance3D" parent="."]
+visible = false
 position = Vector3(0, 1.57, 0.431)
 mesh = SubResource("Box3Mesh")
 
 [node name="Hood" type="MeshInstance3D" parent="."]
+visible = false
 position = Vector3(0, 2.02, 0.55)
 rotation_degrees = Vector3(-68, 0, 0)
 mesh = SubResource("Box4Mesh")
@@ -218,16 +226,19 @@ collision_layer = 32
 collision_mask = 0
 
 [node name="Mesh" type="MeshInstance3D" parent="FrontBumper"]
+visible = false
 mesh = SubResource("Box5Mesh")
 
 [node name="Collision" type="CollisionShape3D" parent="FrontBumper"]
 shape = SubResource("Box5Shape")
 
 [node name="LeftHeadlight" type="MeshInstance3D" parent="."]
+visible = false
 position = Vector3(-0.57, 1.1, 1.715)
 mesh = SubResource("Box6Mesh")
 
 [node name="RightHeadlight" type="MeshInstance3D" parent="."]
+visible = false
 position = Vector3(0.57, 1.1, 1.715)
 mesh = SubResource("Box7Mesh")
 
@@ -276,23 +287,27 @@ mesh = SubResource("Box11Mesh")
 shape = SubResource("Box11Shape")
 
 [node name="RearLeft" type="MeshInstance3D" parent="."]
+visible = false
 position = Vector3(-1, 0.8, -1.1)
 rotation = Vector3(0, 0, 1.5707963)
 mesh = SubResource("FixedWheelMesh")
 material_override = SubResource("FixedWheelMaterial")
 
 [node name="RearRight" type="MeshInstance3D" parent="."]
+visible = false
 position = Vector3(1, 0.8, -1.1)
 rotation = Vector3(0, 0, 1.5707963)
 mesh = SubResource("FixedWheelMesh")
 material_override = SubResource("FixedWheelMaterial")
 
 [node name="FrontRight" type="MeshInstance3D" parent="."]
+visible = false
 position = Vector3(1, 0.8, 1.1)
 rotation = Vector3(0, 0, 1.5707963)
 mesh = SubResource("FixedWheelMesh")
 material_override = SubResource("FixedWheelMaterial")
 
 [node name="FrontLeftAssembly" parent="." instance=ExtResource("1")]
+position = Vector3(0.2935, 0, 0.1555)
 
 [node name="EngineBayPrototype" parent="." instance=ExtResource("2")]
