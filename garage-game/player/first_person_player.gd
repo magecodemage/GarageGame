@@ -30,7 +30,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		set_controls_enabled(false)
 		return
 	if not controls_enabled:
-		if event.is_action_pressed("primary_interact") and not get_tree().paused:
+		if (event.is_action_pressed("grab_item") or event.is_action_pressed("primary_interact")) and not get_tree().paused:
 			set_controls_enabled(true)
 			interaction.wait_for_primary_release = true
 		return
@@ -47,7 +47,7 @@ func set_controls_enabled(value: bool) -> void:
 	controls_enabled = value
 	interaction.enabled = value
 	if not value:
-		interaction.cancel_interaction()
+		interaction.cancel_interaction(false)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED if value else Input.MOUSE_MODE_VISIBLE
 
 

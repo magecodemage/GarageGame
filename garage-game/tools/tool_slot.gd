@@ -15,7 +15,7 @@ func is_compatible(item: Grabbable) -> bool:
 
 
 func release_hint() -> String:
-	return "Solte LMB para guardar a chave"
+	return "[G] Guardar a chave"
 
 
 func validate_configuration() -> PackedStringArray:

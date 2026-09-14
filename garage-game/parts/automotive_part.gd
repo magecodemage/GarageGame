@@ -20,6 +20,7 @@ enum State { FREE, HELD, PLACED, PARTIALLY_FASTENED, FASTENED }
 @export var installation_rotation_degrees := Vector3.ZERO
 
 var state: State = State.FREE
+var removal_guard: Callable
 var installed: bool:
 	get: return is_instance_valid(placement_socket)
 var current_socket: Node3D:
@@ -51,9 +52,12 @@ func can_remove() -> Dictionary:
 func get_remove_evaluation() -> Dictionary:
 	if not installed:
 		return {"allowed": true, "reason": ""}
+	if removal_guard.is_valid():
+		var guarded: Dictionary = removal_guard.call()
+		if not guarded["allowed"]:
+			return guarded
 	if not placement_socket.can_remove():
-		var count: int = placement_socket.get_tight_fastener_count()
-		return {"allowed": false, "reason": "Afrouxe os %d parafusos de %s." % [count, display_name]}
+		return {"allowed": false, "reason": "Afrouxe todos os %d parafusos" % required_fasteners}
 	if dependencies:
 		return dependencies.evaluate_remove(_mechanical_registry())
 	return {"allowed": true, "reason": ""}
@@ -134,7 +138,7 @@ func interaction_context(held: RigidBody3D) -> Dictionary:
 	result["detail"] = _inspection_status()
 	if installed:
 		var evaluation := get_remove_evaluation()
-		result["hint"] = "Segure LMB para remover" if evaluation["allowed"] else evaluation["reason"]
+		result["hint"] = "[LMB] Pegar / remover" if evaluation["allowed"] else evaluation["reason"]
 	result["debug"] += "\nClasse: %s\nTipo: %s\nEstado: %s\nSocket: %s\nFixação: %.2f\n%s" % [
 		_class_label(), part_type, State.keys()[state], placement_socket.socket_id if installed else "-",
 		fastening_ratio, dependencies.describe() if dependencies else "Sem dependências"]

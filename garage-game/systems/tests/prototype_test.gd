@@ -13,9 +13,15 @@ var interaction: InteractionController
 var save: SaveSystem
 var mechanical_state: VehicleMechanicalState
 var last_context: Dictionary = {}
+var garage_scene_path: String = "res://world/garage_test.tscn"
+var golf_reference_mode: bool = false
 
 
 func _initialize() -> void:
+	for argument: String in OS.get_cmdline_user_args():
+		if argument == "--golf-reference":
+			garage_scene_path = "res://world/garage_golf_test.tscn"
+			golf_reference_mode = true
 	run.call_deferred()
 
 
@@ -48,18 +54,16 @@ func press(action: StringName, count: int = 3) -> void:
 
 
 func begin_grab(item: Grabbable) -> void:
-	Input.action_release("primary_interact")
+	Input.action_release("grab_item")
 	await frames(3)
 	aim_at(item.global_position)
 	await frames(3)
-	Input.action_press("primary_interact")
-	await frames(3)
-	check(carrier.held_item == item, "LMB down pega " + item.display_name)
+	await press(&"grab_item")
+	check(carrier.held_item == item, "Um clique pega e mantém " + item.display_name)
 
 
 func release_grab() -> void:
-	Input.action_release("primary_interact")
-	await frames(4)
+	await press(&"drop_item")
 
 
 func scroll(direction: int, count: int = 1) -> void:
@@ -121,7 +125,7 @@ func tool_by_size(size: int) -> Tool:
 
 
 func run() -> void:
-	garage = (load("res://world/garage_test.tscn") as PackedScene).instantiate() as Node3D
+	garage = (load(garage_scene_path) as PackedScene).instantiate() as Node3D
 	root.add_child(garage)
 	current_scene = garage
 	player = garage.get_node("Player") as FirstPersonPlayer
@@ -144,12 +148,15 @@ func run() -> void:
 	check(save.validate_scene(), "Registro sem IDs duplicados/configurações inválidas")
 	check(toolbox.tools.size() == 12 and toolbox.slots.size() == 12, "Caixa contém 12 chaves e 12 slots")
 	check(socket.fasteners.size() == 5, "Roda possui cinco parafusos independentes")
-	check(mechanical_state.get_parts().size() == 10, "Veículo registra dez peças mecânicas")
+	check(mechanical_state.get_parts().size() == (13 if golf_reference_mode else 10), "Veículo registra todas as peças mecânicas")
+	if golf_reference_mode:
+		_check_golf_reference_visual()
 	var used_sizes: Dictionary = {}
 	for fastener in garage.get_tree().get_nodes_in_group("fasteners"):
 		used_sizes[fastener.required_tool_size] = true
-	check([8, 10, 12, 13, 14, 17, 19].all(func(size: int) -> bool: return used_sizes.has(size)),
-		"Conjunto mecânico usa todas as sete chaves requeridas")
+	var expected_sizes: Array = [8, 10, 12, 13, 14, 17] if golf_reference_mode else [8, 10, 12, 13, 14, 17, 19]
+	check(expected_sizes.all(func(size: int) -> bool: return used_sizes.has(size)),
+		"Conjunto mecânico usa as chaves requeridas")
 	check(player.is_on_floor(), "Player apoiado no piso")
 	_check_input_map()
 	await capture("initial")
@@ -165,6 +172,56 @@ func run() -> void:
 	result_file.store_string(JSON.stringify({"checks": checks, "failures": failures}))
 	result_file.close()
 	quit(0 if failures == 0 else 1)
+
+
+func _check_golf_reference_visual() -> void:
+	var car_visual := garage.get_node("CarPrototype/CarVisual") as Node3D
+	var imported_body := car_visual.get_node_or_null("ImportedCar") as Node3D
+	check(imported_body != null, "Golf GLB carregado como visual desacoplado")
+	if imported_body != null:
+		var body_meshes := imported_body.find_children("*", "MeshInstance3D", true, false)
+		check(body_meshes.size() == 26, "Golf preserva carroceria e interior sem duplicar as quatro rodas")
+		check(imported_body.find_child("*Interior*", true, false) != null, "Interior do Golf presente")
+		var imported_hood := imported_body.find_child("hood", true, false) as Node3D
+		check(
+			imported_hood != null and is_zero_approx(imported_hood.rotation.x),
+			"Capô separado começa fechado no pivô correto"
+		)
+		var material_surfaces := 0
+		for mesh_node: MeshInstance3D in body_meshes:
+			if mesh_node.mesh != null:
+				for surface_index: int in mesh_node.mesh.get_surface_count():
+					if mesh_node.mesh.surface_get_material(surface_index) != null:
+						material_surfaces += 1
+		check(material_surfaces >= 12, "Materiais do Golf presentes no Godot")
+
+	var wheel_visual := wheel.get_node_or_null("Visual/GolfWheelMesh") as Node3D
+	check(wheel_visual != null, "Roda Golf é filha visual da VehiclePart dianteira esquerda")
+	if wheel_visual != null:
+		check(
+			wheel_visual.find_children("*", "MeshInstance3D", true, false).size() == 3,
+			"Visual interativo da roda contém aro, banda e lateral do pneu"
+		)
+	check(wheel.get_node_or_null("Tire") == null and wheel.get_node_or_null("Rim") == null,
+		"Placeholder visual da roda removido da variante sem duplicação")
+	var chassis_collision := garage.get_node("CarPrototype/Chassis/Collision") as CollisionShape3D
+	var chassis_box := chassis_collision.shape as BoxShape3D
+	check(
+		chassis_box != null and chassis_box.size.y < 0.08 and chassis_box.size.x <= 1.3,
+		"Collider de assoalho fino mantém rodas e cofre acessíveis"
+	)
+	check(
+		(player.collision_mask & 32) != 0,
+		"Jogador colide com a camada Vehicle e não atravessa a carroceria"
+	)
+
+	var expected_visual_center: Vector3 = car_visual.global_position \
+		+ Vector3(0.742542, 0.307435, 1.195712)
+	var actual_socket_center := socket.global_position
+	check(
+		expected_visual_center.distance_to(actual_socket_center) < 0.001,
+		"Roda Golf dianteira esquerda alinhada ao socket mecânico (tolerância 1 mm)"
+	)
 
 
 func _movement_checks() -> void:

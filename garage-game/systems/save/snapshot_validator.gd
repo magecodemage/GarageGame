@@ -79,6 +79,13 @@ static func validate(data: Dictionary, registry: SceneRegistry) -> String:
 		var system_error := system.validate_saved_state(value["data"])
 		if not system_error.is_empty():
 			return system_error
+	# Cross-record invariants run only after all item/system records are valid,
+	# and still before SceneSnapshot.apply can change any live object.
+	for value: Dictionary in data["systems"]:
+		var system := registry.nodes[StringName(value["id"])] as VehicleRuntimeSystem
+		var snapshot_error := system.validate_saved_snapshot(value["data"], data)
+		if not snapshot_error.is_empty():
+			return snapshot_error
 	return ""
 
 

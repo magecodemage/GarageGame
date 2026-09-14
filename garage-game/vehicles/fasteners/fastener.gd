@@ -14,6 +14,8 @@ signal fastener_fully_loosened(fastener: Fastener)
 @export var position_index: int = 0
 @export var bolt_mesh: MeshInstance3D
 @export var interaction_audio: InteractionAudio
+@export var insertion_axis := Vector3.RIGHT
+@export var travel_per_step: float = 0.001
 
 var required_tool_type: StringName:
 	get: return spec.required_tool_type
@@ -54,7 +56,7 @@ func set_tightness(value: int) -> void:
 	var previous: int = tightness
 	tightness = clampi(value, 0, max_tightness)
 	if bolt_mesh:
-		bolt_mesh.position = _mesh_origin + Vector3(tightness * 0.004, 0, 0)
+		bolt_mesh.position = _mesh_origin + insertion_axis * tightness * travel_per_step
 		bolt_mesh.rotation.x = float(tightness) * PI / 3.0
 	if _material:
 		_material.albedo_color = Color(0.45, 0.5, 0.53) if tightness == 0 else (
@@ -95,7 +97,7 @@ func interaction_context(held: RigidBody3D) -> Dictionary:
 	if accepts_tool(held):
 		hint = "Scroll ↑ Apertar   ·   Scroll ↓ Afrouxar"
 	elif held is Tool:
-		hint = ("Tamanho incorreto — necessário %d mm" % required_tool_size
+		hint = ("Requer chave %d mm" % required_tool_size
 			if held.tool_type == required_tool_type else "Tipo de ferramenta incorreto")
 	if locked:
 		hint = "Parafuso bloqueado"

@@ -30,6 +30,12 @@ func validate_saved_state(data: Dictionary) -> String:
 	return "" if data is Dictionary else "Estado inválido: " + str(system_id)
 
 
+func validate_saved_snapshot(_data: Dictionary, _snapshot: Dictionary) -> String:
+	# Optional cross-record checks, after every record passed local validation.
+	# This hook must inspect the snapshot only; never mutate the live scene.
+	return ""
+
+
 func validate_configuration() -> PackedStringArray:
 	var issues := PackedStringArray()
 	if system_id.is_empty():

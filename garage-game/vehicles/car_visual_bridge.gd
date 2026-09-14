@@ -22,6 +22,14 @@ func _ready() -> void:
 
 
 func _load_glb() -> void:
+	# Exported builds contain the imported PackedScene, not necessarily raw GLB.
+	if ResourceLoader.exists(glb_path, "PackedScene"):
+		var packed := load(glb_path) as PackedScene
+		if packed:
+			var imported := packed.instantiate()
+			imported.name = "ImportedCar"
+			add_child(imported)
+			return
 	var document := GLTFDocument.new()
 	var state := GLTFState.new()
 	var absolute_path := ProjectSettings.globalize_path(glb_path)

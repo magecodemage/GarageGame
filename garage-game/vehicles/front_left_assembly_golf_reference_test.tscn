@@ -1,0 +1,254 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://vehicles/part_socket.gd" id="1"]
+[ext_resource type="PackedScene" path="res://vehicles/fasteners/wheel_bolt.tscn" id="2"]
+[ext_resource type="Script" path="res://vehicles/fasteners/fastener_spec.gd" id="3"]
+[ext_resource type="PackedScene" path="res://parts/suspension/front_left_strut.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://parts/suspension/front_left_hub.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://parts/brakes/front_left_brake_disc.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://parts/brakes/front_left_brake_caliper.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://parts/wheel_golf_reference.tscn" id="8"]
+
+[sub_resource type="Resource" id="Spec10"]
+script = ExtResource("3")
+required_tool_size = 10
+max_tightness = 4
+
+[sub_resource type="Resource" id="Spec13"]
+script = ExtResource("3")
+required_tool_size = 13
+max_tightness = 4
+
+[sub_resource type="Resource" id="Spec17"]
+script = ExtResource("3")
+required_tool_size = 17
+max_tightness = 4
+
+[sub_resource type="Resource" id="Spec19"]
+script = ExtResource("3")
+required_tool_size = 19
+max_tightness = 4
+
+[sub_resource type="StandardMaterial3D" id="PreviewMaterial"]
+transparency = 1
+albedo_color = Color(0.95, 0.65, 0.2, 0.15)
+emission_enabled = true
+
+[sub_resource type="SphereMesh" id="PreviewMesh"]
+radius = 0.16
+height = 0.32
+
+[sub_resource type="SphereShape3D" id="SocketShape"]
+radius = 0.2
+
+[node name="FrontLeftAssembly" type="Node3D"]
+
+[node name="Parts" type="Node3D" parent="."]
+
+[node name="Strut" parent="Parts" instance=ExtResource("4")]
+position = Vector3(-0.78, 1.23, 1.1)
+
+[node name="Hub" parent="Parts" instance=ExtResource("5")]
+position = Vector3(-0.82, 0.8, 1.1)
+
+[node name="BrakeDisc" parent="Parts" instance=ExtResource("6")]
+position = Vector3(-0.88, 0.8, 1.1)
+
+[node name="BrakeCaliper" parent="Parts" instance=ExtResource("7")]
+position = Vector3(-0.91, 0.96, 1.1)
+
+[node name="Wheel" parent="Parts" instance=ExtResource("8")]
+position = Vector3(-1.05, 0.8, 1.1)
+
+[node name="StrutSocket" type="Area3D" parent="." node_paths=PackedStringArray("installation_point", "preview", "fastener_root", "initial_part")]
+position = Vector3(-0.78, 1.23, 1.1)
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1")
+socket_id = &"front_left_strut_socket"
+socket_type = &"strut_mount"
+compatible_part_types = Array[StringName]([&"strut"])
+installation_point = NodePath("InstallationPoint")
+preview = NodePath("Preview")
+fastener_root = NodePath("Fasteners")
+initial_part = NodePath("../Parts/Strut")
+
+[node name="InstallationPoint" type="Marker3D" parent="StrutSocket"]
+[node name="Preview" type="MeshInstance3D" parent="StrutSocket"]
+mesh = SubResource("PreviewMesh")
+material_override = SubResource("PreviewMaterial")
+[node name="Collision" type="CollisionShape3D" parent="StrutSocket"]
+shape = SubResource("SocketShape")
+[node name="Fasteners" type="Node3D" parent="StrutSocket"]
+[node name="LowerBolt" parent="StrutSocket/Fasteners" instance=ExtResource("2")]
+position = Vector3(-0.13, -0.13, 0)
+fastener_id = &"front_left_strut_lower_bolt"
+display_name = "Parafuso inferior do amortecedor"
+spec = SubResource("Spec17")
+tightness = 4
+position_index = 0
+[node name="UpperBolt" parent="StrutSocket/Fasteners" instance=ExtResource("2")]
+position = Vector3(-0.13, 0.16, 0)
+fastener_id = &"front_left_strut_upper_bolt"
+display_name = "Parafuso superior do amortecedor"
+spec = SubResource("Spec13")
+tightness = 4
+position_index = 1
+
+[node name="HubSocket" type="Area3D" parent="." node_paths=PackedStringArray("installation_point", "preview", "fastener_root", "initial_part")]
+position = Vector3(-0.82, 0.8, 1.1)
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1")
+socket_id = &"front_left_hub_socket"
+socket_type = &"hub_mount"
+compatible_part_types = Array[StringName]([&"wheel_hub"])
+installation_point = NodePath("InstallationPoint")
+preview = NodePath("Preview")
+fastener_root = NodePath("Fasteners")
+initial_part = NodePath("../Parts/Hub")
+[node name="InstallationPoint" type="Marker3D" parent="HubSocket"]
+[node name="Preview" type="MeshInstance3D" parent="HubSocket"]
+mesh = SubResource("PreviewMesh")
+material_override = SubResource("PreviewMaterial")
+[node name="Collision" type="CollisionShape3D" parent="HubSocket"]
+shape = SubResource("SocketShape")
+[node name="Fasteners" type="Node3D" parent="HubSocket"]
+[node name="Bolt1" parent="HubSocket/Fasteners" instance=ExtResource("2")]
+position = Vector3(-0.13, 0.09, 0)
+fastener_id = &"front_left_hub_bolt_1"
+display_name = "Parafuso do cubo"
+spec = SubResource("Spec17")
+tightness = 4
+position_index = 0
+[node name="Bolt2" parent="HubSocket/Fasteners" instance=ExtResource("2")]
+position = Vector3(-0.13, -0.09, 0)
+fastener_id = &"front_left_hub_bolt_2"
+display_name = "Parafuso do cubo"
+spec = SubResource("Spec17")
+tightness = 4
+position_index = 1
+
+[node name="BrakeDiscSocket" type="Area3D" parent="." node_paths=PackedStringArray("installation_point", "preview", "fastener_root", "initial_part")]
+position = Vector3(-0.88, 0.8, 1.1)
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1")
+socket_id = &"front_left_brake_disc_socket"
+socket_type = &"brake_disc_mount"
+compatible_part_types = Array[StringName]([&"brake_disc"])
+installation_point = NodePath("InstallationPoint")
+preview = NodePath("Preview")
+fastener_root = NodePath("Fasteners")
+initial_part = NodePath("../Parts/BrakeDisc")
+[node name="InstallationPoint" type="Marker3D" parent="BrakeDiscSocket"]
+[node name="Preview" type="MeshInstance3D" parent="BrakeDiscSocket"]
+mesh = SubResource("PreviewMesh")
+material_override = SubResource("PreviewMaterial")
+[node name="Collision" type="CollisionShape3D" parent="BrakeDiscSocket"]
+shape = SubResource("SocketShape")
+[node name="Fasteners" type="Node3D" parent="BrakeDiscSocket"]
+[node name="Screw1" parent="BrakeDiscSocket/Fasteners" instance=ExtResource("2")]
+position = Vector3(-0.13, 0.06, 0)
+fastener_id = &"front_left_brake_disc_screw_1"
+display_name = "Parafuso do disco"
+spec = SubResource("Spec10")
+tightness = 0
+position_index = 0
+[node name="Screw2" parent="BrakeDiscSocket/Fasteners" instance=ExtResource("2")]
+position = Vector3(-0.13, -0.06, 0)
+fastener_id = &"front_left_brake_disc_screw_2"
+display_name = "Parafuso do disco"
+spec = SubResource("Spec10")
+tightness = 0
+position_index = 1
+
+[node name="BrakeCaliperSocket" type="Area3D" parent="." node_paths=PackedStringArray("installation_point", "preview", "fastener_root", "initial_part")]
+position = Vector3(-0.91, 0.96, 1.1)
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1")
+socket_id = &"front_left_brake_caliper_socket"
+socket_type = &"brake_caliper_mount"
+compatible_part_types = Array[StringName]([&"brake_caliper"])
+installation_point = NodePath("InstallationPoint")
+preview = NodePath("Preview")
+fastener_root = NodePath("Fasteners")
+initial_part = NodePath("../Parts/BrakeCaliper")
+[node name="InstallationPoint" type="Marker3D" parent="BrakeCaliperSocket"]
+[node name="Preview" type="MeshInstance3D" parent="BrakeCaliperSocket"]
+mesh = SubResource("PreviewMesh")
+material_override = SubResource("PreviewMaterial")
+[node name="Collision" type="CollisionShape3D" parent="BrakeCaliperSocket"]
+shape = SubResource("SocketShape")
+[node name="Fasteners" type="Node3D" parent="BrakeCaliperSocket"]
+[node name="Bolt1" parent="BrakeCaliperSocket/Fasteners" instance=ExtResource("2")]
+position = Vector3(-0.14, 0.11, 0)
+fastener_id = &"front_left_brake_caliper_bolt_1"
+display_name = "Parafuso da pinça"
+spec = SubResource("Spec13")
+tightness = 4
+position_index = 0
+[node name="Bolt2" parent="BrakeCaliperSocket/Fasteners" instance=ExtResource("2")]
+position = Vector3(-0.14, -0.11, 0)
+fastener_id = &"front_left_brake_caliper_bolt_2"
+display_name = "Parafuso da pinça"
+spec = SubResource("Spec13")
+tightness = 4
+position_index = 1
+
+[node name="WheelSocket" type="Area3D" parent="." node_paths=PackedStringArray("installation_point", "preview", "fastener_root", "initial_part")]
+position = Vector3(-1.05, 0.8, 1.1)
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1")
+socket_id = &"front_left_wheel_socket"
+socket_type = &"wheel_hub"
+compatible_part_types = Array[StringName]([&"wheel"])
+installation_point = NodePath("InstallationPoint")
+preview = NodePath("Preview")
+fastener_root = NodePath("Fasteners")
+initial_part = NodePath("../Parts/Wheel")
+snap_distance = 0.68
+[node name="InstallationPoint" type="Marker3D" parent="WheelSocket"]
+[node name="Preview" type="MeshInstance3D" parent="WheelSocket"]
+mesh = SubResource("PreviewMesh")
+material_override = SubResource("PreviewMaterial")
+[node name="Collision" type="CollisionShape3D" parent="WheelSocket"]
+shape = SubResource("SocketShape")
+[node name="Fasteners" type="Node3D" parent="WheelSocket"]
+[node name="Bolt1" parent="WheelSocket/Fasteners" instance=ExtResource("2")]
+position = Vector3(-0.18, 0.17, 0)
+fastener_id = &"front_left_wheel_bolt_1"
+display_name = "Parafuso da roda"
+spec = SubResource("Spec19")
+tightness = 4
+position_index = 0
+[node name="Bolt2" parent="WheelSocket/Fasteners" instance=ExtResource("2")]
+position = Vector3(-0.18, 0.0525, 0.162)
+fastener_id = &"front_left_wheel_bolt_2"
+display_name = "Parafuso da roda"
+spec = SubResource("Spec19")
+tightness = 4
+position_index = 1
+[node name="Bolt3" parent="WheelSocket/Fasteners" instance=ExtResource("2")]
+position = Vector3(-0.18, -0.138, 0.1)
+fastener_id = &"front_left_wheel_bolt_3"
+display_name = "Parafuso da roda"
+spec = SubResource("Spec19")
+tightness = 4
+position_index = 2
+[node name="Bolt4" parent="WheelSocket/Fasteners" instance=ExtResource("2")]
+position = Vector3(-0.18, -0.138, -0.1)
+fastener_id = &"front_left_wheel_bolt_4"
+display_name = "Parafuso da roda"
+spec = SubResource("Spec19")
+tightness = 4
+position_index = 3
+[node name="Bolt5" parent="WheelSocket/Fasteners" instance=ExtResource("2")]
+position = Vector3(-0.18, 0.0525, -0.162)
+fastener_id = &"front_left_wheel_bolt_5"
+display_name = "Parafuso da roda"
+spec = SubResource("Spec19")
+tightness = 4
+position_index = 4

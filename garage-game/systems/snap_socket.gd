@@ -66,7 +66,8 @@ func get_snap_evaluation(item: Grabbable) -> Dictionary:
 		return {"allowed": false, "reason": "Aproxime a peça do encaixe."}
 	# Não permite snap através de paredes ou do chassi.
 	var query := PhysicsRayQueryParameters3D.create(
-		item.global_position, installation_point.global_position, 33, [item.get_rid()])
+		item.global_position + item.get_snap_clearance_offset(),
+		installation_point.global_position + item.get_snap_clearance_offset(), 33, [item.get_rid()])
 	if not get_world_3d().direct_space_state.intersect_ray(query).is_empty():
 		return {"allowed": false, "reason": "O encaixe está obstruído."}
 	return {"allowed": true, "reason": ""}
@@ -107,7 +108,7 @@ func set_highlight(available: bool) -> void:
 
 
 func release_hint() -> String:
-	return "Solte LMB para instalar"
+	return "[G] Encaixar (aperte os parafusos após instalar)"
 
 
 func interaction_context(_held: RigidBody3D) -> Dictionary:

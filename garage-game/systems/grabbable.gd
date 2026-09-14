@@ -38,6 +38,14 @@ func get_persistent_id() -> StringName:
 	return &""
 
 
+func set_release_parent(parent: Node3D) -> void:
+	# Moving a supported vehicle must not carry already removed components.
+	# Existing scenes keep their original parent unless explicitly configured.
+	_world_parent = parent
+	if not is_instance_valid(placement_socket) and get_parent() != parent:
+		reparent(parent, true)
+
+
 func can_pick_up() -> bool:
 	return can_be_grabbed and not is_held and (
 		not is_instance_valid(placement_socket) or placement_socket.is_accessible()
@@ -84,7 +92,7 @@ func _restore_holder_collision() -> void:
 	query.transform = Transform3D(Basis.IDENTITY, global_position)
 	query.collision_mask = 8
 	# Se o jogador entrou no item, restaura o contato quando houver separação.
-	# O objeto já está FREE; isso nunca mantém um hold depois de soltar LMB.
+	# O objeto já está FREE; isso nunca mantém um hold depois de pressionar G.
 	if get_world_3d().direct_space_state.intersect_shape(query, 1).is_empty():
 		remove_collision_exception_with(_holder)
 		_holder = null
@@ -125,6 +133,30 @@ func get_installation_pose() -> Transform3D:
 	return Transform3D.IDENTITY
 
 
+func get_carry_offset(distance: float) -> Vector3:
+	return Vector3(0.38, -0.22, -distance)
+
+
+func get_carry_basis(current_camera_relative: Basis) -> Basis:
+	return current_camera_relative
+
+
+func get_carry_world_basis(proposed: Basis) -> Basis:
+	return proposed
+
+
+func get_carry_clearance_offset() -> Vector3:
+	return Vector3.ZERO
+
+
+func get_snap_clearance_offset() -> Vector3:
+	return Vector3.ZERO
+
+
+func get_held_hint() -> String:
+	return "[G] Soltar / encaixar · RMB + mouse: girar · R + scroll: distância"
+
+
 func _integrate_forces(body_state: PhysicsDirectBodyState3D) -> void:
 	if not is_held:
 		return
@@ -150,7 +182,7 @@ func interaction_primary() -> RigidBody3D:
 
 
 func interaction_context(_held: RigidBody3D) -> Dictionary:
-	return {"title": display_name, "hint": "Segure LMB para pegar" if can_pick_up() else "",
+	return {"title": display_name, "hint": "[LMB] Pegar" if can_pick_up() else "",
 		"debug": "ID: %s\nMassa: %.2f kg" % [get_persistent_id(), mass]}
 
 

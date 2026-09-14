@@ -37,7 +37,7 @@ func pick_up(item: Grabbable) -> bool:
 	var sphere := SphereShape3D.new()
 	sphere.radius = item.carry_radius
 	clearance.shape = sphere
-	_relative_basis = camera.global_basis.inverse() * item.global_basis
+	_relative_basis = item.get_carry_basis(camera.global_basis.inverse() * item.global_basis)
 	_smoothed_target = item.global_position
 	item.hold_strength = hold_strength
 	item.hold_damping = hold_damping
@@ -50,12 +50,10 @@ func update_hold(delta: float) -> void:
 	if not is_instance_valid(held_item):
 		_clear_candidate()
 		return
-	if camera.global_position.distance_to(held_item.global_position) > max_hold_distance:
-		release(false)
-		return
 	global_transform = camera.global_transform
-	var distance: float = clampf(hold_distance, maxf(min_hold_distance, held_item.carry_radius + 0.4), 2.3)
-	var offset := Vector3(0.38, -0.22, -distance)
+	clearance.position = camera.global_basis.inverse() * held_item.get_carry_clearance_offset()
+	var distance: float = clampf(hold_distance, maxf(min_hold_distance, held_item.carry_radius + 0.4), minf(2.3, max_hold_distance))
+	var offset: Vector3 = held_item.get_carry_offset(distance)
 	clearance.target_position = Vector3.ZERO
 	clearance.force_shapecast_update()
 	if clearance.is_colliding():
@@ -68,7 +66,7 @@ func update_hold(delta: float) -> void:
 		var desired: Vector3 = camera.to_global(offset * fraction)
 		_smoothed_target = _smoothed_target.move_toward(desired, target_speed * delta)
 	held_item.hold_target = Transform3D(
-		(camera.global_basis * _relative_basis).orthonormalized(), _smoothed_target)
+		held_item.get_carry_world_basis((camera.global_basis * _relative_basis).orthonormalized()), _smoothed_target)
 	refresh_candidate()
 
 

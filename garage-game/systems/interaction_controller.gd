@@ -13,6 +13,9 @@ var target: InteractionTarget
 var enabled: bool = true
 var wait_for_primary_release: bool = false
 var _was_primary_down: bool = false
+var _was_drop_down: bool = false
+var _grab_requested: bool = false
+var _drop_requested: bool = false
 var _scroll_steps: Array[int] = []
 var _ray_ignored_item: Grabbable
 
@@ -29,21 +32,31 @@ func _physics_process(delta: float) -> void:
 		return
 	carrier.update_hold(delta)
 	refresh_target()
-	var primary_down: bool = Input.is_action_pressed("primary_interact")
+	# Os eventos retêm cliques completos entre dois ticks de física. A consulta de
+	# estado também permite Input.action_press nos testes e preserva o alias antigo.
+	var primary_down: bool = Input.is_action_pressed("grab_item") or Input.is_action_pressed("primary_interact")
+	var drop_down: bool = Input.is_action_pressed("drop_item")
+	var wants_grab: bool = _grab_requested or (primary_down and not _was_primary_down)
+	var wants_drop: bool = _drop_requested or (drop_down and not _was_drop_down)
 	if wait_for_primary_release:
 		wait_for_primary_release = primary_down
-	elif primary_down and not _was_primary_down and target:
+	elif wants_grab and not is_instance_valid(carrier.held_item) and is_instance_valid(target):
 		var body: RigidBody3D = target.primary()
 		if body is Grabbable:
 			carrier.pick_up(body)
-		else:
+		elif target.subject is Grabbable:
+			# Capô e toolbox executam uma ação e retornam null por contrato.
+			# Só a recusa de uma peça pegável representa falha de pickup.
 			var blocked_context: Dictionary = target.context(carrier.held_item)
 			var reason: String = blocked_context.get("hint", "")
 			if not reason.is_empty():
 				action_feedback.emit(reason)
-	if not primary_down and is_instance_valid(carrier.held_item):
+	if wants_drop and is_instance_valid(carrier.held_item):
 		carrier.release()
 	_was_primary_down = primary_down
+	_was_drop_down = drop_down
+	_grab_requested = false
+	_drop_requested = false
 	for direction in _scroll_steps:
 		if target:
 			if not target.scroll(carrier.held_item, direction):
@@ -63,6 +76,12 @@ func refresh_target() -> void:
 func handle_input(event: InputEvent) -> bool:
 	if not enabled:
 		return false
+	if event.is_action_pressed("grab_item") or event.is_action_pressed("primary_interact"):
+		_grab_requested = true
+		return true
+	if event.is_action_pressed("drop_item"):
+		_drop_requested = true
+		return true
 	if event is InputEventMouseMotion and is_instance_valid(carrier.held_item):
 		if Input.is_action_pressed("secondary_interact"):
 			carrier.rotate_item(event.relative)
@@ -86,7 +105,11 @@ func emit_context() -> void:
 	var held: Grabbable = carrier.held_item
 	var context: Dictionary = target.context(held) if is_instance_valid(target) else {}
 	if is_instance_valid(held):
-		context["held"] = held.display_name
+		context["held"] = "%s  ·  [G] Soltar" % held.display_name
+		# Com um item equipado, LMB nunca pega outro objeto nem o solta.
+		# O alvo com scroll mantém o feedback de tamanho/compatibilidade.
+		if not is_instance_valid(target) or not target.subject.has_method("interaction_scroll"):
+			context["hint"] = held.get_held_hint()
 		if carrier.candidate:
 			context["title"] = held.display_name
 			context["hint"] = carrier.candidate.release_hint()
@@ -94,9 +117,12 @@ func emit_context() -> void:
 	context_changed.emit(context)
 
 
-func cancel_interaction() -> void:
-	carrier.release(false)
+func cancel_interaction(release_item: bool = true) -> void:
+	if release_item:
+		carrier.release(false)
 	_scroll_steps.clear()
+	_grab_requested = false
+	_drop_requested = false
 	wait_for_primary_release = true
 
 

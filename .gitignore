@@ -1,0 +1,28 @@
+# Local browser/test tooling.
+.playwright-mcp/
+
+# Volkswagen Golf reference asset and all derivatives are local-only.
+# REFERENCE ONLY | DO NOT SHIP | NON-COMMERCIAL ASSET
+garage-game/external_reference/
+garage-game/blender/source/golf_reference_test.blend*
+garage-game/blender/exports/golf_reference_*
+garage-game/blender/previews/golf_reference/
+garage-game/blender/source/golf_reference_panels.blend*
+garage-game/blender/source/golf_suspension_work.blend*
+garage-game/blender/exports/golf_suspension_*
+garage-game/blender/previews_panels/
+garage-game/blender/previews_suspension/
+garage-game/blender/previews_jack/
+garage-game/blender/reports/golf_*.json
+garage-game/vehicles/golf_suspension_manifest.json
+
+# Authored .tscn scenes and scripts are public; imported reference data is not.
+# Local exports, user saves and credentials must never be staged with source.
+garage-game/*.exe
+garage-game/*.pck
+garage-game/*.pck.tmp
+garage-game/saves/
+garage-game/garage_*_v*.json
+garage-game/golf_jack_player_validation.json*
+garage-game/.godot/export_credentials.cfg
+build/

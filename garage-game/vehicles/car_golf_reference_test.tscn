@@ -1,0 +1,314 @@
+[gd_scene load_steps=44 format=3]
+
+[ext_resource type="PackedScene" path="res://vehicles/front_left_assembly_golf_reference_test.tscn" id="1"]
+[ext_resource type="PackedScene" path="res://vehicles/engine_bay_prototype.tscn" id="2"]
+[ext_resource type="Script" path="res://vehicles/vehicle_mechanical_state.gd" id="3"]
+[ext_resource type="Script" path="res://systems/engine/fuel_system.gd" id="4"]
+[ext_resource type="Script" path="res://systems/engine/oil_system.gd" id="5"]
+[ext_resource type="Script" path="res://systems/engine/coolant_system.gd" id="6"]
+[ext_resource type="Script" path="res://systems/engine/ignition_system.gd" id="7"]
+[ext_resource type="Script" path="res://systems/engine/engine_audio.gd" id="8"]
+[ext_resource type="Script" path="res://systems/engine/engine_controller.gd" id="9"]
+[ext_resource type="PackedScene" path="res://vehicles/car_visual.tscn" id="10"]
+[sub_resource type="StandardMaterial3D" id="Box1Material"]
+albedo_color = Color(0.12, 0.3, 0.32, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box1Mesh"]
+size = Vector3(1.7, 0.32, 3.4)
+material = SubResource("Box1Material")
+
+[sub_resource type="BoxShape3D" id="Box1Shape"]
+size = Vector3(1.78, 0.32, 3.9)
+
+[sub_resource type="StandardMaterial3D" id="Box2Material"]
+albedo_color = Color(0.19, 0.38, 0.39, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box2Mesh"]
+size = Vector3(1.48, 0.65, 1.65)
+material = SubResource("Box2Material")
+
+[sub_resource type="BoxShape3D" id="Box2Shape"]
+size = Vector3(1.48, 0.65, 1.65)
+
+[sub_resource type="StandardMaterial3D" id="Box3Material"]
+albedo_color = Color(0.08, 0.14, 0.18, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box3Mesh"]
+size = Vector3(1.28, 0.4, 0.015)
+material = SubResource("Box3Material")
+
+[sub_resource type="StandardMaterial3D" id="Box4Material"]
+albedo_color = Color(0.17, 0.37, 0.38, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box4Mesh"]
+size = Vector3(1.56, 0.08, 0.95)
+material = SubResource("Box4Material")
+
+[sub_resource type="StandardMaterial3D" id="Box5Material"]
+albedo_color = Color(0.5, 0.55, 0.56, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box5Mesh"]
+size = Vector3(1.8, 0.15, 0.16)
+material = SubResource("Box5Material")
+
+[sub_resource type="BoxShape3D" id="Box5Shape"]
+size = Vector3(1.8, 0.15, 0.16)
+
+[sub_resource type="StandardMaterial3D" id="Box6Material"]
+albedo_color = Color(0.95, 0.87, 0.6, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box6Mesh"]
+size = Vector3(0.32, 0.16, 0.03)
+material = SubResource("Box6Material")
+
+[sub_resource type="StandardMaterial3D" id="Box7Material"]
+albedo_color = Color(0.95, 0.87, 0.6, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box7Mesh"]
+size = Vector3(0.32, 0.16, 0.03)
+material = SubResource("Box7Material")
+
+[sub_resource type="StandardMaterial3D" id="Box8Material"]
+albedo_color = Color(0.82, 0.44, 0.1, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box8Mesh"]
+size = Vector3(0.3, 0.8, 0.35)
+material = SubResource("Box8Material")
+
+[sub_resource type="BoxShape3D" id="Box8Shape"]
+size = Vector3(0.3, 0.8, 0.35)
+
+[sub_resource type="StandardMaterial3D" id="Box9Material"]
+albedo_color = Color(0.82, 0.44, 0.1, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box9Mesh"]
+size = Vector3(0.3, 0.8, 0.35)
+material = SubResource("Box9Material")
+
+[sub_resource type="BoxShape3D" id="Box9Shape"]
+size = Vector3(0.3, 0.8, 0.35)
+
+[sub_resource type="StandardMaterial3D" id="Box10Material"]
+albedo_color = Color(0.82, 0.44, 0.1, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box10Mesh"]
+size = Vector3(0.3, 0.8, 0.35)
+material = SubResource("Box10Material")
+
+[sub_resource type="BoxShape3D" id="Box10Shape"]
+size = Vector3(0.3, 0.8, 0.35)
+
+[sub_resource type="StandardMaterial3D" id="Box11Material"]
+albedo_color = Color(0.82, 0.44, 0.1, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Box11Mesh"]
+size = Vector3(0.3, 0.8, 0.35)
+material = SubResource("Box11Material")
+
+[sub_resource type="BoxShape3D" id="Box11Shape"]
+size = Vector3(0.3, 0.8, 0.35)
+
+[sub_resource type="CylinderMesh" id="FixedWheelMesh"]
+top_radius = 0.42
+bottom_radius = 0.42
+height = 0.24
+
+[sub_resource type="StandardMaterial3D" id="FixedWheelMaterial"]
+albedo_color = Color(0.065, 0.07, 0.08, 1)
+
+[node name="CarPrototype" type="Node3D"]
+
+[node name="CarVisual" parent="." instance=ExtResource("10")]
+position = Vector3(0, 0.485, 0)
+glb_path = "res://blender/exports/golf_reference_test.glb"
+
+[node name="MechanicalState" type="Node" parent="."]
+script = ExtResource("3")
+vehicle_id = &"car_prototype"
+critical_part_ids = Array[StringName]([&"front_left_strut", &"front_left_hub", &"front_left_brake_disc", &"front_left_brake_caliper", &"front_left_wheel", &"battery", &"radiator", &"air_filter_box", &"alternator", &"starter_motor"])
+electrical_part_ids = Array[StringName]([&"battery", &"starter_motor", &"alternator"])
+engine_critical_part_ids = Array[StringName]([&"battery", &"starter_motor", &"air_filter_box"])
+
+[node name="EngineSystems" type="Node" parent="."]
+
+[node name="FuelSystem" type="Node" parent="EngineSystems"]
+script = ExtResource("4")
+system_id = &"fuel_system"
+
+[node name="OilSystem" type="Node" parent="EngineSystems"]
+script = ExtResource("5")
+system_id = &"oil_system"
+
+[node name="CoolantSystem" type="Node" parent="EngineSystems"]
+script = ExtResource("6")
+system_id = &"coolant_system"
+
+[node name="IgnitionSystem" type="Node" parent="EngineSystems"]
+script = ExtResource("7")
+system_id = &"ignition_system"
+
+[node name="EngineAudio" type="Node" parent="EngineSystems" node_paths=PackedStringArray("starter_player", "engine_player", "one_shot_player")]
+script = ExtResource("8")
+starter_player = NodePath("StarterPlayer")
+engine_player = NodePath("EnginePlayer")
+one_shot_player = NodePath("OneShotPlayer")
+
+[node name="StarterPlayer" type="AudioStreamPlayer3D" parent="EngineSystems/EngineAudio"]
+[node name="EnginePlayer" type="AudioStreamPlayer3D" parent="EngineSystems/EngineAudio"]
+[node name="OneShotPlayer" type="AudioStreamPlayer3D" parent="EngineSystems/EngineAudio"]
+
+[node name="EngineController" type="Node" parent="EngineSystems" node_paths=PackedStringArray("mechanical_state", "ignition", "fuel_system", "oil_system", "coolant_system", "engine_audio")]
+script = ExtResource("9")
+system_id = &"engine_controller"
+mechanical_state = NodePath("../../MechanicalState")
+ignition = NodePath("../IgnitionSystem")
+fuel_system = NodePath("../FuelSystem")
+oil_system = NodePath("../OilSystem")
+coolant_system = NodePath("../CoolantSystem")
+engine_audio = NodePath("../EngineAudio")
+
+[node name="EngineTestInstructions" type="Label3D" parent="."]
+position = Vector3(0, 1.95, -0.05)
+rotation_degrees = Vector3(0, 180, 0)
+text = "T: ENGINE TEST\nI: IGNITION   K: START"
+font_size = 38
+pixel_size = 0.003
+modulate = Color(0.45, 0.9, 1, 1)
+
+[node name="Chassis" type="StaticBody3D" parent="."]
+position = Vector3(0, 1.05, 0)
+collision_layer = 32
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="Chassis"]
+visible = false
+mesh = SubResource("Box1Mesh")
+
+[node name="Collision" type="CollisionShape3D" parent="Chassis"]
+shape = SubResource("Box1Shape")
+
+[node name="Cabin" type="StaticBody3D" parent="."]
+position = Vector3(0, 1.53, -0.4)
+collision_layer = 32
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="Cabin"]
+visible = false
+mesh = SubResource("Box2Mesh")
+
+[node name="Collision" type="CollisionShape3D" parent="Cabin"]
+shape = SubResource("Box2Shape")
+
+[node name="Windshield" type="MeshInstance3D" parent="."]
+visible = false
+position = Vector3(0, 1.57, 0.431)
+mesh = SubResource("Box3Mesh")
+
+[node name="Hood" type="MeshInstance3D" parent="."]
+visible = false
+position = Vector3(0, 2.02, 0.55)
+rotation_degrees = Vector3(-68, 0, 0)
+mesh = SubResource("Box4Mesh")
+
+[node name="FrontBumper" type="StaticBody3D" parent="."]
+position = Vector3(0, 0.96, 2.0)
+collision_layer = 32
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="FrontBumper"]
+visible = false
+mesh = SubResource("Box5Mesh")
+
+[node name="Collision" type="CollisionShape3D" parent="FrontBumper"]
+shape = SubResource("Box5Shape")
+
+[node name="LeftHeadlight" type="MeshInstance3D" parent="."]
+visible = false
+position = Vector3(-0.57, 1.1, 1.715)
+mesh = SubResource("Box6Mesh")
+
+[node name="RightHeadlight" type="MeshInstance3D" parent="."]
+visible = false
+position = Vector3(0.57, 1.1, 1.715)
+mesh = SubResource("Box7Mesh")
+
+[node name="StandLeftRear" type="StaticBody3D" parent="."]
+position = Vector3(-0.55, 0.4, -1.1)
+collision_layer = 32
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="StandLeftRear"]
+mesh = SubResource("Box8Mesh")
+
+[node name="Collision" type="CollisionShape3D" parent="StandLeftRear"]
+shape = SubResource("Box8Shape")
+
+[node name="StandLeftFront" type="StaticBody3D" parent="."]
+position = Vector3(-0.55, 0.4, 1.1)
+collision_layer = 32
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="StandLeftFront"]
+mesh = SubResource("Box9Mesh")
+
+[node name="Collision" type="CollisionShape3D" parent="StandLeftFront"]
+shape = SubResource("Box9Shape")
+
+[node name="StandRightRear" type="StaticBody3D" parent="."]
+position = Vector3(0.55, 0.4, -1.1)
+collision_layer = 32
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="StandRightRear"]
+mesh = SubResource("Box10Mesh")
+
+[node name="Collision" type="CollisionShape3D" parent="StandRightRear"]
+shape = SubResource("Box10Shape")
+
+[node name="StandRightFront" type="StaticBody3D" parent="."]
+position = Vector3(0.55, 0.4, 1.1)
+collision_layer = 32
+collision_mask = 0
+
+[node name="Mesh" type="MeshInstance3D" parent="StandRightFront"]
+mesh = SubResource("Box11Mesh")
+
+[node name="Collision" type="CollisionShape3D" parent="StandRightFront"]
+shape = SubResource("Box11Shape")
+
+[node name="RearLeft" type="MeshInstance3D" parent="."]
+visible = false
+position = Vector3(-1, 0.8, -1.1)
+rotation = Vector3(0, 0, 1.5707963)
+mesh = SubResource("FixedWheelMesh")
+material_override = SubResource("FixedWheelMaterial")
+
+[node name="RearRight" type="MeshInstance3D" parent="."]
+visible = false
+position = Vector3(1, 0.8, -1.1)
+rotation = Vector3(0, 0, 1.5707963)
+mesh = SubResource("FixedWheelMesh")
+material_override = SubResource("FixedWheelMaterial")
+
+[node name="FrontRight" type="MeshInstance3D" parent="."]
+visible = false
+position = Vector3(1, 0.8, 1.1)
+rotation = Vector3(0, 0, 1.5707963)
+mesh = SubResource("FixedWheelMesh")
+material_override = SubResource("FixedWheelMaterial")
+
+[node name="FrontLeftAssembly" parent="." instance=ExtResource("1")]
+position = Vector3(0.2935, 0, 0.1555)
+
+[node name="EngineBayPrototype" parent="." instance=ExtResource("2")]

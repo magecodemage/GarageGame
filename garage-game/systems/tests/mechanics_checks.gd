@@ -38,12 +38,12 @@ func run(t: SceneTree) -> void:
 	var wheel_bolt: Fastener = wheel_socket.fasteners[0]
 	wheel_socket.place_item(wheel, true)
 	wheel_bolt.set_tightness(3)
-	var wrong_tool: Tool = t.tool_by_size(17)
+	var wrong_tool: Tool = t.tool_by_size(15)
 	wrong_tool.begin_hold(t.player)
 	t.check(not wheel_bolt.interaction_scroll(wrong_tool, -1) and wheel_bolt.tightness == 3,
 		"TEST 6: ferramenta errada não altera o parafuso")
 	wrong_tool.end_hold()
-	var correct_tool: Tool = t.tool_by_size(19)
+	var correct_tool: Tool = t.tool_by_size(wheel_bolt.required_tool_size)
 	correct_tool.begin_hold(t.player)
 	t.check(wheel_bolt.interaction_scroll(correct_tool, -1) and wheel_bolt.tightness == 2,
 		"TEST 7: ferramenta correta altera exatamente um nível por scroll")

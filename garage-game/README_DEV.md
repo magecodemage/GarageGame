@@ -2,12 +2,24 @@
 
 ## Escopo e execução
 
-Este protótipo Godot 4.7.2 demonstra manutenção automotiva em uma garagem usando
-somente GDScript e meshes primitivas. A cena principal é
-`res://world/garage_test.tscn`; F5 executa o projeto e F6 executa a cena aberta.
+Este protótipo Godot 4.7.2 demonstra manutenção automotiva em uma garagem.
+A cena de desenvolvimento atual é `res://world/garage_golf_test.tscn`;
+F5 passa pela entrada `world/project_entry.tscn`, que abre essa mesma garagem
+com os recursos locais ou mostra instruções quando estão ausentes. Não há
+substituição automática pelo carro legado. F6 executa a cena aberta. O Golf é referência temporária
+não comercial. A cena anterior permanece disponível e o backup completo
+anterior à integração fica em `C:/GarageGame-backups/golf-before-integration-20260911-204102`.
+Leia [docs/GOLF_SUSPENSION.md](docs/GOLF_SUSPENSION.md) para a etapa atual:
+46 componentes de suspensão desmontáveis, duas portas reais e hatch articulados.
+[docs/GOLF_INTEGRATION.md](docs/GOLF_INTEGRATION.md) registra a integração anterior.
+O backup anterior à suspensão está em `C:/GarageGame-backups/suspension-before-20260912`.
+O backup anterior ao macaco está em `C:/GarageGame-backups/suspension-before-jack-20260913`.
+Veja [docs/GOLF_JACK.md](docs/GOLF_JACK.md) para apoio, serviço FL e limitações,
+e [docs/GIT_REFERENCE_SETUP.md](docs/GIT_REFERENCE_SETUP.md) para preparar um clone
+sem redistribuir o modelo de referência. Nenhum `AGENTS.md` foi encontrado na árvore atual.
 
 O carro ainda não dirige. Não existem cidade, NPCs, economia, motor interno,
-circuito elétrico completo nem assets externos.
+circuito elétrico completo nem física final de direção.
 
 ## Controles
 
@@ -15,13 +27,16 @@ circuito elétrico completo nem assets externos.
 - Mouse: câmera.
 - Espaço: pular.
 - Ctrl: agachar.
-- LMB segurado: pegar/manter peça ou ferramenta; soltar instala ou deixa cair.
+- LMB uma vez (`grab_item`): pegar e manter peça ou ferramenta.
+- G (`drop_item`): soltar; instala somente quando há socket válido destacado.
 - RMB + mouse: girar o item carregado.
 - R + roda do mouse: ajustar distância do item.
 - Roda do mouse sobre fastener: apertar/afrouxar um nível.
+- Macaco posicionado: scroll ↑ levanta, scroll ↓ baixa; LMB pega e G encaixa/solta.
+- Rodas só saem com o canto adequadamente apoiado e seus cinco parafusos soltos.
 - P: pausa.
 - F2/F9: salvar/carregar.
-- F3: debug do alvo.
+- F3: debug do alvo e overlay de origens visuais/sockets/colliders/fasteners no Golf.
 - F8: reset da garagem.
 - Esc: liberar o mouse.
 - T: entrar/sair do modo temporário de teste do motor.
@@ -58,7 +73,7 @@ ui/                      HUD e mensagens temporárias
 blender/                 fonte, export, previews e geradores do carro
 ```
 
-## Carro visual intermediário
+## Carro visual intermediário (legado preservado)
 
 `vehicles/car_visual.tscn` carrega `blender/exports/car_main.glb` com
 `GLTFDocument` como camada visual do `CarPrototype`. Isso evita depender de um
@@ -134,7 +149,7 @@ Estados de `AutomotivePart`: `FREE`, `HELD`, `PLACED`,
 
 ## Conjuntos e IDs
 
-`vehicles/front_left_assembly.tscn` contém:
+`vehicles/front_left_assembly.tscn` (legado) contém:
 
 | Peça | ID | Socket | Fasteners |
 |---|---|---|---|
@@ -156,7 +171,13 @@ Estados de `AutomotivePart`: `FREE`, `HELD`, `PLACED`,
 
 Todos os IDs de peça, socket, fastener, ferramenta, slot e toolbox são estáveis
 e únicos na cena. A toolbox atual fornece chaves 6, 7, 8, 9, 10, 11, 12, 13,
-14, 15, 17 e 19 mm; portanto cobre todas as novas fixações.
+14, 15, 17 e 19 mm no legado. A variante atual acrescenta 16, 18 e 21 mm,
+mantendo os IDs e tamanhos anteriores.
+
+Na variante Golf, os sockets são reposicionados pelos centros geométricos
+reais. Há quatro rodas independentes e 20 parafusos de 17 mm. Os IDs da FL
+foram preservados; FR/RL/RR ganham IDs próprios. A frente é +Z e a esquerda
+do veículo é +X. A tabela acima documenta apenas o conjunto legado.
 
 ## Fundação elétrica e propriedades futuras
 
@@ -265,7 +286,9 @@ Nenhuma condição sobre classes concretas deve ser adicionada ao Player ou ao
 
 ## Save, load e reset
 
-O schema 3 usa `user://garage_slice_v3.json`. Ele persiste:
+O schema 3 usa `user://garage_slice_v3.json` no legado. A suspensão atual usa
+`user://garage_suspension_v1.json`, preservando o arquivo da etapa anterior.
+Não há conversão silenciosa entre esses layouts. Ele persiste:
 
 - pose, pitch e agachamento do jogador;
 - ID, transform, socket, estado instalado/armazenado, condição, desgaste e
@@ -315,7 +338,11 @@ Ainda precisam de avaliação manual: conforto da sensibilidade, precisão ao mi
 em fasteners próximos, sensação de peso/jitter, manipulação junto ao jogador e
 paredes e legibilidade do HUD em diferentes resoluções.
 
-## Visual master da carroceria — fase 01
+## Histórico preservado: visual master da carroceria — fase 01
+
+Esta seção registra uma fase anterior, não o fluxo atual. Não executar seus
+scripts para substituir o Golf. O arquivo de trabalho atual da referência é
+`blender/source/golf_reference_test.blend`, conforme `docs/GOLF_INTEGRATION.md`.
 
 O protótipo procedural anterior continua preservado em `blender/source/car_main.blend`
 e `blender/exports/car_main.glb`. Uma cópia congelada também existe em
